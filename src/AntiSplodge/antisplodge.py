@@ -98,6 +98,7 @@ def getProportionFromCountVector(Y_list):
 
     return ret_list
 
+
 class SingleCellDataset(Dataset):
 
     def __init__(self, X_data, y_data):
@@ -312,6 +313,11 @@ class DeconvolutionExperiment:
         self.model = model
 
 
+    def loadCheckpoint(self, checkpoint):
+        print("Restoring checkpoint:", checkpoint)
+        self.model.load_state_dict(torch.load(checkpoint))
+
+
 # patience is the number of epochs before stopping
 def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=True):
     # time the function
@@ -451,7 +457,45 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
     print(f"Time elapsed: {(time.time() - t0):.2f} ({(time.time() - t0)/60:.2f} Minutes)")
     if auto_load_model_on_finish:
         print("Autoloading best parameters onto model (auto_load_model_on_finish==True)")
-        loadCheckpoint(model, save_file)
-        experiment.model = model # bind the model to the experiment
+        experiment:loadCheckpoint(model, save_file) # restore the best checkpoint
 
     return stats
+
+
+
+def predict(model, data_loader):
+    profiles = []
+    device = model.Get("device")
+    with torch.no_grad():
+        model.eval()
+        for X_batch, y_batch in data_loader:
+            X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+            y_pred = model(X_batch)
+
+            #
+            # SCALE TO 1
+            #
+            # debug added
+            y_pred = nn.functional.relu(y_pred) # first remove negatives
+
+            if np.sum(np.isnan(y_pred.detach().cpu().numpy())) > 0:
+                print("y_pred is nan (before)")
+
+            # scale to 1
+            sums_ = torch.sum(y_pred, 1)
+            y_pred = torch.transpose(y_pred, 0, 1)
+            y_pred = torch.div(y_pred, sums_)
+            y_pred = torch.transpose(y_pred, 0, 1)
+
+            if np.sum(np.isnan(y_pred.detach().cpu().numpy())) > 0:
+                print("y_pred is nan (after)")
+
+            #
+            # END OF SCALING
+            #
+
+            for prof in y_pred:
+                profiles.append(prof.detach().cpu().numpy())
+
+
+    return profiles
