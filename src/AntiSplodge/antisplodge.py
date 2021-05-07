@@ -463,12 +463,17 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
 
 
 
-def predict(model, data_loader):
+def predict(experiment):
     profiles = []
+
+    # retrieve experiment elements
+    model        = experiment.model
+    test_loader  = experiment.test_loader
+
     device = model.Get("device")
     with torch.no_grad():
         model.eval()
-        for X_batch, y_batch in data_loader:
+        for X_batch, y_batch in test_loader:
             X_batch, y_batch = X_batch.to(device), y_batch.to(device)
             y_pred = model(X_batch)
 
