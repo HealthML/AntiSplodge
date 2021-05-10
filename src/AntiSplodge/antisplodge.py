@@ -182,7 +182,7 @@ class DeconvolutionExperiment:
 
     def setCellTypeColumn(self, name):
         print(self)
-        self.celltypes_column = name
+        #self.celltypes_column = name
         #self.celltypes = np.array(np.unique(self.SC.obs[name]))
         #self.num_classes = len(self.celltypes)
 
