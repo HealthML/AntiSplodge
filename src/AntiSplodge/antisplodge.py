@@ -220,17 +220,17 @@ class DeconvolutionExperiment:
         X_test_profiles =  multinomialSampler(self.num_classes, num_profiles[2], CD[0], CD[1])
 
         if self.verbose:
-            print("GENERATING TRAIN DATASET")
+            print("GENERATING TRAIN DATASET (N={})".format(len(X_train_profiles)))
         X_train, Y_train, I_ = getConvolutedProfilesFromDistributions(self.SC_train, self.celltypes, self.celltypes_column, X_train_profiles)
         Y_train_prop = getProportionFromCountVector(X_train_profiles)
 
         if self.verbose:
-            print("GENERATING VALIDATION DATASET")
+            print("GENERATING VALIDATION DATASET (N={})".format(len(X_val_profiles)))
         X_val, Y_val, I_ =     getConvolutedProfilesFromDistributions(self.SC_val, self.celltypes, self.celltypes_column, X_val_profiles)
         Y_val_prop = getProportionFromCountVector(X_val_profiles)
 
         if self.verbose:
-            print("GENERATING TEST DATASET")
+            print("GENERATING TEST DATASET (N={})".format(len(X_test_profiles)))
         X_test, Y_test, I_ =   getConvolutedProfilesFromDistributions(self.SC_test, self.celltypes, self.celltypes_column, X_test_profiles)
         Y_test_prop = getProportionFromCountVector(X_test_profiles)
 
@@ -279,7 +279,7 @@ class DeconvolutionExperiment:
         self.val_loader = val_loader
         self.test_loader = test_loader
 
-    def setupModel(self, cuda_id=1, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1):
+    def setupModel(self, cuda_id=1, learning_rate = 0.001, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1):
         # CUDA SETTINGS
         device = torch.device("cuda:{}".format(cuda_id) if torch.cuda.is_available() else "cpu")
         if self.verbose:
@@ -300,7 +300,7 @@ class DeconvolutionExperiment:
         model.to(device)
 
         # define optimizer and criterion
-        optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
         criterion = torch.nn.SmoothL1Loss(beta=0.25)
 
         # attach members as to the model object
