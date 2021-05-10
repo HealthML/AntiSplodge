@@ -326,7 +326,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
     # retrieve experiment elements
     model        = experiment.model
     train_loader = experiment.train_loader
-    val_loader   = train_loader.val_loader
+    val_loader   = experiment.val_loader
 
     # a save file is generated if not specified
     if save_file == None:
