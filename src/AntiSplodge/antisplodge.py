@@ -42,7 +42,6 @@ def getConvolutedProfilesFromDistributions(adata, cell_types, cell_type_key, dis
     cell_types_cache = {}
     desified_X_cache = {}
     for cell_type in cell_types:
-        print(cell_type)
         cell_types_cache[cell_type] = adata_copy[adata_copy.obs[cell_type_key] == cell_type,:]
         desified_X_cache[cell_type] = cell_types_cache[cell_type].X.toarray()
 
