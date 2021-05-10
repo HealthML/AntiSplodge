@@ -23,6 +23,6 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
-    install_requires=['numpy>=1.17.2', 'pandas>=0.25.3', 'sklearn>=0.22.1'
+    install_requires=['numpy>=1.17.2', 'pandas>=0.25.3', 'scikit-learn>=0.22.1'
                      ]
 )
