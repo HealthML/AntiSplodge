@@ -199,7 +199,7 @@ class DeconvolutionExperiment:
         # Use the rest to split into validation and test
         #
         SC_rest = self.SC[RestIndex,:]
-        ValIndex, TestIndex, _, _ = train_test_split(range(0,self.SC_rest.n_obs),
+        ValIndex, TestIndex, _, _ = train_test_split(range(0,SC_rest.n_obs),
                                                      SC_rest.obs[self.celltypes_column],
                                                      test_size=rest,
                                                      stratify=SC_rest.obs[self.celltypes_column])
