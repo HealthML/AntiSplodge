@@ -423,7 +423,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
                     val_epoch_loss += loss_
 
         # STATS
-        tel = train_epoch_loss/(len(data_loader)-train_loss_counter) # reduce by NaNs found
+        tel = train_epoch_loss/(len(train_loader)-train_loss_counter) # reduce by NaNs found
         vel = val_epoch_loss/(len(val_loader)-val_loss_counter) # reduce by NaNs found
 
         # Check validation loss
@@ -484,7 +484,8 @@ def predict(experiment):
             y_pred = nn.functional.relu(y_pred) # first remove negatives
 
             if np.sum(np.isnan(y_pred.detach().cpu().numpy())) > 0:
-                print("y_pred is nan (before)")
+                if self.verbose:
+                    print("y_pred is nan (before)")
 
             # scale to 1
             sums_ = torch.sum(y_pred, 1)
@@ -493,7 +494,8 @@ def predict(experiment):
             y_pred = torch.transpose(y_pred, 0, 1)
 
             if np.sum(np.isnan(y_pred.detach().cpu().numpy())) > 0:
-                print("y_pred is nan (after)")
+                if self.verbose:
+                    print("y_pred is nan (after)")
 
             #
             # END OF SCALING
