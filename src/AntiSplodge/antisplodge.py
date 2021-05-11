@@ -450,7 +450,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
         # report current stats
         if experiment.verbose:
             print(f'Epoch: {e_+0:03} | Epochs since last increase: {(p_-1)+0:03}' + ('| !!NaNs vectors produced!!' if nans_found else ''))
-            print(f'Loss: (Train) {tel:.5f} | (Valid): {tea:.3f}')
+            print(f'Loss: (Train) {tel:.5f} | (Valid): {vel:.3f}')
             print("")
 
     print("Finished training (checkpoint saved in: {})".format(save_file))
