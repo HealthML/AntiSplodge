@@ -463,12 +463,14 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
 
 
 
-def predict(experiment):
+def predict(experiment, test_loader=None):
     profiles = []
 
     # retrieve experiment elements
     model        = experiment.model
-    test_loader  = experiment.test_loader
+    # if test_loader is not set, use the one from the experiment
+    if test_loader == None:
+        test_loader = experiment.test_loader
 
     device = model.Get("device")
     with torch.no_grad():
