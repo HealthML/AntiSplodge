@@ -221,17 +221,17 @@ class DeconvolutionExperiment:
 
         if self.verbose:
             print("GENERATING TRAIN DATASET (N={})".format(len(X_train_profiles)))
-        X_train, Y_train, I_ = getConvolutedProfilesFromDistributions(self.SC_train, self.celltypes, self.celltypes_column, X_train_profiles)
+        X_train, Y_train, I_ = getConvolutedProfilesFromDistributions(self.SC_train, self.celltypes, self.celltypes_column, X_train_profiles, normalize_X=True)
         Y_train_prop = getProportionFromCountVector(X_train_profiles)
 
         if self.verbose:
             print("GENERATING VALIDATION DATASET (N={})".format(len(X_val_profiles)))
-        X_val, Y_val, I_ =     getConvolutedProfilesFromDistributions(self.SC_val, self.celltypes, self.celltypes_column, X_val_profiles)
+        X_val, Y_val, I_ =     getConvolutedProfilesFromDistributions(self.SC_val, self.celltypes, self.celltypes_column, X_val_profiles, normalize_X=True)
         Y_val_prop = getProportionFromCountVector(X_val_profiles)
 
         if self.verbose:
             print("GENERATING TEST DATASET (N={})".format(len(X_test_profiles)))
-        X_test, Y_test, I_ =   getConvolutedProfilesFromDistributions(self.SC_test, self.celltypes, self.celltypes_column, X_test_profiles)
+        X_test, Y_test, I_ =   getConvolutedProfilesFromDistributions(self.SC_test, self.celltypes, self.celltypes_column, X_test_profiles, normalize_X=True)
         Y_test_prop = getProportionFromCountVector(X_test_profiles)
 
         # bind counts, proportions and convoluted profiles
