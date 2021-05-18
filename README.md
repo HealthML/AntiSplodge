@@ -88,9 +88,10 @@ spot_preds = AS.predict(Exp, spots_loader) # predict spots
 ### Profile generation
 
 ### Several ways of training 
-The standard training procedure is 
 
 **1. Standard training**
+
+The standard training procedure.
 ```python
 # Assuming an Exp is an DeconvolutionExperiment
 AS.train(experiment=Exp, patience=25, save_file=None, auto_load_model_on_finish=True) # default parameters
@@ -102,17 +103,19 @@ This will make the best model weights be loaded back onto the model and it will 
 ```python
 # Do 10 warm restarts 
 for (i in range(10) {
-    AS.train(experiment=Exp, patience=5) # default parameters
+    AS.train(experiment=Exp, patience=5) 
 }
 ```
 
 **3. Lowering learning rate**
+
+Start with a high learning rate and lower this by half for each warm restart.
 ```python
 lr = 0.01
 
 Exp.setupModel(cuda_id=6, learning_rate = lr)
 for (i in range(10) {
-    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) # default parameters
+    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) 
     
     # Set learning rate to the half
     lr /= 2 
@@ -123,6 +126,24 @@ for (i in range(10) {
 
 
 **4. Running on systems with reduced memory**
+
+For users having trouble with the memory footprint of the profile generation, it is possible to generate smaller sets of training and validation profiles. 
+```python
+Exp.splitTrainTestValidation(train=0.8, rest=0.5) # define the dataset splits
+Exp.setupModel(cuda_id=6) # the model can be built beforehand
+
+# do 100 warm restarts with smaller chunks of training data
+for (i in range(100) {
+    Exp.generateTrainTestValidation(num_profiles=[5000,1000,1], CD=[1,10])
+    Exp.setupDataLoaders()
+    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) 
+}
+
+# Remember to generate test profiles after training is complete 
+Exp.generateTrainTestValidation(num_profiles=[1,1,1000], CD=[1,10])
+
+# Continue as usual
+```
 
 ### Use profiles and train the network with low memory and warm restarts 
 
