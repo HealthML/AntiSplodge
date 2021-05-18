@@ -24,7 +24,7 @@ Subsequently, run the following pip command from your terminal (in the root of c
 
 ## Usage
 
-The full pipeline (see blow) assumes that you have a scRNA dataset (SC) and spatial transcriptomics dataset (ST) that both are formatted as .h5ad (AnnData data structures). Please see [https://anndata.readthedocs.io/] for information about how to structure your data. Alternative you can check out the tutorial [INSERT TUTORIAL LINK] for an example on how to do this.
+The full pipeline (see blow) assumes that you have a scRNA dataset (SC) and spatial transcriptomics dataset (ST) that both are formatted as .h5ad (AnnData data structures). Please see https://anndata.readthedocs.io/ for information about how to structure your data. Alternative you can check out the tutorial [INSERT TUTORIAL LINK] for an example on how to do this.
 
 ### Standard pipeline
 
@@ -87,7 +87,33 @@ spot_preds = AS.predict(Exp, spots_loader) # predict spots
 
 ### Profile generation
 
+### Several ways of training 
+The standard training procedure is 
 
+1. Standard training
+```python
+# Assuming an Exp is an DeconvolutionExperiment
+AS.train(experiment=Exp, patience=25, save_file=None, auto_load_model_on_finish=True) # default parameters
+```
+2. Several warm restarts
+Do 10 warm restarts with a low patience (n=5), this will autoload the model per train call.
+This will make the best model weights be loaded back onto the model and it will try again from these settings
+```python
+# Do 10 warm restarts 
+for (i in range(10) {
+    AS.train(experiment=Exp, patience=5) # default parameters
+}
+```
+
+3. Lowering learning rate
+
+
+4. Running on systems with reduced memory
+
+### Use profiles and train the network with low memory and warm restarts 
+
+### Tutorial
+Check out the tutorial [INSERT TUTORIAL LINK].
 See tutorials.
 
 ## Dependencies
