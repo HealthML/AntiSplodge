@@ -18,7 +18,7 @@ From a terminal this can be done by running:
 
 `git clone git@github.com:HealthML/AntiSplodge.git`
 
-Subsequently, run the following pip command from your terminal:
+Subsequently, run the following pip command from your terminal (in the root of cloned directory):
 
 `pip install .`
 
@@ -42,4 +42,4 @@ The source code for AntiSplodge is licensed under the MIT License. See the [LICE
 
 ## Known bugs 
 
-- AntiSplodge is prone to be affected by bad initiations. Oftentimes, this can be resolved by simply restarting the Experiment (or re-initializing the model). This seems to be more frequent when solving problems with many classes (large number of cell types).
+- AntiSplodge is prone to be affected by bad initiations. Oftentimes, this can be resolved by simply restarting the Experiment (or re-initializing the model). This seems to be more frequent when solving problems with many classes (large number of cell types). If verose is set to true, you should see output warnings during training with (`!!NaNs vectors produced!!`, these are not a problem if they only persist for a single iteration and is gone in the next).
