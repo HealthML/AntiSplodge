@@ -467,7 +467,7 @@ def predict(experiment, test_loader=None):
     profiles = []
 
     # retrieve experiment elements
-    model        = experiment.model
+    model = experiment.model
     # if test_loader is not set, use the one from the experiment
     if test_loader == None:
         test_loader = experiment.test_loader
@@ -486,7 +486,7 @@ def predict(experiment, test_loader=None):
             y_pred = nn.functional.relu(y_pred) # first remove negatives
 
             if np.sum(np.isnan(y_pred.detach().cpu().numpy())) > 0:
-                if self.verbose:
+                if experiment.verbose:
                     print("y_pred is nan (before)")
 
             # scale to 1
@@ -496,7 +496,7 @@ def predict(experiment, test_loader=None):
             y_pred = torch.transpose(y_pred, 0, 1)
 
             if np.sum(np.isnan(y_pred.detach().cpu().numpy())) > 0:
-                if self.verbose:
+                if experiment.verbose:
                     print("y_pred is nan (after)")
 
             #
