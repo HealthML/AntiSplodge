@@ -90,12 +90,13 @@ spot_preds = AS.predict(Exp, spots_loader) # predict spots
 ### Several ways of training 
 The standard training procedure is 
 
-1. Standard training
+**1. Standard training**
 ```python
 # Assuming an Exp is an DeconvolutionExperiment
 AS.train(experiment=Exp, patience=25, save_file=None, auto_load_model_on_finish=True) # default parameters
 ```
-2. Several warm restarts
+**2. Several warm restarts**
+
 Do 10 warm restarts with a low patience (n=5), this will autoload the model per train call.
 This will make the best model weights be loaded back onto the model and it will try again from these settings
 ```python
@@ -105,10 +106,23 @@ for (i in range(10) {
 }
 ```
 
-3. Lowering learning rate
+**3. Lowering learning rate**
+```python
+lr = 0.01
+
+Exp.setupModel(cuda_id=6, learning_rate = lr)
+for (i in range(10) {
+    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) # default parameters
+    if (i > 0) {
+        Exp.setupModel(cuda_id=6, learning_rate = lr)
+        lr /= 2 # Set learning rate to the half
+        Exp.loadCheckpoint("CurrentDeconvolver.pt") # Set the weights back to the model
+    }
+}
+```
 
 
-4. Running on systems with reduced memory
+**4. Running on systems with reduced memory**
 
 ### Use profiles and train the network with low memory and warm restarts 
 
