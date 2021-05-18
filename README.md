@@ -113,11 +113,11 @@ lr = 0.01
 Exp.setupModel(cuda_id=6, learning_rate = lr)
 for (i in range(10) {
     AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) # default parameters
-    if (i > 0) {
-        Exp.setupModel(cuda_id=6, learning_rate = lr)
-        lr /= 2 # Set learning rate to the half
-        Exp.loadCheckpoint("CurrentDeconvolver.pt") # Set the weights back to the model
-    }
+    
+    # Set learning rate to the half
+    lr /= 2 
+    Exp.setupModel(cuda_id=6, learning_rate = lr)
+    Exp.loadCheckpoint("CurrentDeconvolver.pt") # Set the weights back to the model
 }
 ```
 
