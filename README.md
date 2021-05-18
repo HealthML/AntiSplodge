@@ -58,6 +58,7 @@ stats = AS.train(Exp, save_file="NNDeconvolver.pt", patience=100)
 # Check the testing accuracy
 y_preds = AS.predict(Exp)
 
+# Print test divergance as (Jensen Shannon divergance)
 import numpy as np
 from scipy.spatial import distance
 jsds_ = []
@@ -65,10 +66,21 @@ for i in range(len(y_preds)):
     jsds_.append(distance.jensenshannon(Exp.Y_test_prop[i], y_preds[i]))
 print("Mean {}".format(np.mean(jsds_)))
 
+# Plot a boxplot of divergences for each test profile 
 import seaborn as sns
 import pandas as pd
 pd.DataFrame({'jsds': jsds_}).to_csv("MouseBrainTestJSDS.csv")
 sns.boxplot(y="JSD", data=pd.DataFrame({'JSD':jsds_}))
+
+# Assuming we have a spatial transcriptomics dataset ST formatted in .h5ad (AnnData)
+# create dataloader so that we can predict the profiles of each spot in our ST dataset
+dataset_spots = AS.SingleCellDataset(torch.from_numpy(np.array(ST.X.toarray())).float(), torch.from_numpy(np.array([0]*ST.n_obs)).float())
+spots_loader = DataLoader(dataset=dataset_spots,
+                      batch_size=50, # batch_size doesn't matter 
+)
+
+spot_preds = AS.predict(Exp, spots_loader) # predict spots
+# The results for each ST profile (spot) is now in spot_preds and can be used for further analysis 
 ```
 
 
