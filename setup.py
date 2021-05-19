@@ -1,11 +1,13 @@
 import setuptools
 
+exec(open("./antisplode/_version.py").read()) # this will provide __version__
+
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="AntiSplodge", # Replace with your own username
-    version="0.0.1",
+    version=__version__,
     author="Jesper Beltoft Lund",
     author_email="Jesper.Lund@hpi.de",
     description="AntiSplodge: A neural network-based spatial transcriptomics deconvolution pipeline",
@@ -23,6 +25,10 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
-    install_requires=['numpy>=1.17.2', 'pandas>=0.25.3', 'scikit-learn>=0.22.1'
-                     ]
+    install_requires=[
+    'numpy>=1.17.2',
+    'pandas>=0.25.3',
+    'scikit-learn>=0.22.1',
+    'torch>=1.9.0'
+    ]
 )

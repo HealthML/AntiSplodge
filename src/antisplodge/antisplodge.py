@@ -1,11 +1,9 @@
-import torch # TODO USED
-from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler # TODO USED
-import numpy as np # TODO USED
-import scanpy as sc
-from scipy.spatial import distance
-from sklearn.model_selection import train_test_split
+import numpy as np
+import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler 
+from sklearn.model_selection import train_test_split
 from datetime import date
 import time
 
