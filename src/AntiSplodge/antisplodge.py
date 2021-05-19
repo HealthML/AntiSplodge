@@ -307,7 +307,7 @@ class DeconvolutionExperiment:
         self.device = device
         self.model = model
 
-    def setupOptimizerAndCriterion(learning_rate = 0.001, optimizer=None, criterion=None):
+    def setupOptimizerAndCriterion(self, learning_rate = 0.001, optimizer=None, criterion=None):
         # define optimizer and criterion if not set
         if optimizer == None:
             optimizer = optim.Adam(model.parameters(), lr=learning_rate)
