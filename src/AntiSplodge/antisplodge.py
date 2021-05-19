@@ -277,7 +277,7 @@ class DeconvolutionExperiment:
             batch_size=batch_size
             # we don't shuffle test data
         )
-2
+
         # bind loaders
         self.train_loader = train_loader
         self.val_loader = val_loader
