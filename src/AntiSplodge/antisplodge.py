@@ -38,7 +38,7 @@ def multinomialSampler(Nc, M, CD_min, CD_max):
 def getConvolutedProfilesFromDistributions(adata, cell_types, cell_type_key, distributions, normalize_X=False):
     # make a copy of the adata
     adata_copy = adata.copy()
-    # pre subset cell_types
+    # pre subset cell_types save expensive operations
     cell_types_cache = {}
     desified_X_cache = {}
     for cell_type in cell_types:
@@ -310,7 +310,7 @@ class DeconvolutionExperiment:
     def setupOptimizerAndCriterion(self, learning_rate = 0.001, optimizer=None, criterion=None):
         # define optimizer and criterion if not set
         if optimizer == None:
-            optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+            optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
 
         if criterion == None:
             criterion = torch.nn.SmoothL1Loss(beta=0.25)
