@@ -51,7 +51,7 @@ def getConvolutedProfilesFromDistributions(adata, cell_types, cell_type_key, dis
     I_list = [] # indices
     for dist_ in distributions:
         cur_x = []
-        cur_y = []Y_val
+        cur_y = []
         cur_I = []
         for i in range(len(dist_)):
             type_ = cell_types[i]
