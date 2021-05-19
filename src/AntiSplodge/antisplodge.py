@@ -241,6 +241,10 @@ class DeconvolutionExperiment:
         self.X_train = X_train
         self.X_val = X_val
         self.X_test = X_test
+
+        self.Y_train = Y_train
+        self.Y_val = Y_val
+        self.Y_test = Y_test
         self.Y_train_prop = Y_train_prop
         self.Y_val_prop = Y_val_prop
         self.Y_test_prop = Y_test_prop
@@ -273,7 +277,7 @@ class DeconvolutionExperiment:
             batch_size=batch_size
             # we don't shuffle test data
         )
-
+2
         # bind loaders
         self.train_loader = train_loader
         self.val_loader = val_loader
