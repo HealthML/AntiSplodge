@@ -283,7 +283,7 @@ class DeconvolutionExperiment:
         self.val_loader = val_loader
         self.test_loader = test_loader
 
-    def setupModel(self, cuda_id=1, , dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1):
+    def setupModel(self, cuda_id=1, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1):
         # CUDA SETTINGS
         device = torch.device("cuda:{}".format(cuda_id) if torch.cuda.is_available() else "cpu")
         if self.verbose:
