@@ -1,6 +1,6 @@
 import setuptools
 
-exec(open("./antisplodge/_version.py").read()) # this will provide __version__
+exec(open("./src/antisplodge/_version.py").read()) # this will provide __version__
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
