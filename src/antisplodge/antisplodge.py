@@ -299,7 +299,7 @@ class DeconvolutionExperiment:
             input_dropout = dropout
         )
         # bind to device
-        self.model.Set("device", device)
+        model.Set("device", device)
         model.to(device)
 
         # bind settings and models
