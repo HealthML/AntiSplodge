@@ -171,6 +171,14 @@ See tutorials.
 
 ## Dependencies
 
+The list of major dependencies are:
+
+- numpy>=1.17.2 (https://numpy.org/)
+- pandas>=0.25.3 (https://pandas.pydata.org/)
+- scikit-learn>=0.22.1 (https://scikit-learn.org/)
+- torch>=1.9.0 (https://pytorch.org/)
+
+
 ## Documentation
 
 The documentation will be available at https://antisplode.readthedocs.io/.
@@ -181,6 +189,6 @@ The documentation will be available at https://antisplode.readthedocs.io/.
 
 The source code for AntiSplodge is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Known bugs 
+## Known issues 
 
 - AntiSplodge is prone to be affected by bad initiations. Oftentimes, this can be resolved by simply restarting the Experiment (or re-initializing the model). This seems to be more frequent when solving problems with many classes (large number of cell types). If verose is set to true, you should see output warnings during training with (`!!NaNs vectors produced!!`, these are not a problem if they only persist for a single iteration and is gone in the next).
