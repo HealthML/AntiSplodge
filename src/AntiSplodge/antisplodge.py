@@ -51,7 +51,7 @@ def getConvolutedProfilesFromDistributions(adata, cell_types, cell_type_key, dis
     I_list = [] # indices
     for dist_ in distributions:
         cur_x = []
-        cur_y = []
+        cur_y = []Y_val
         cur_I = []
         for i in range(len(dist_)):
             type_ = cell_types[i]
@@ -283,7 +283,7 @@ class DeconvolutionExperiment:
         self.val_loader = val_loader
         self.test_loader = test_loader
 
-    def setupModel(self, cuda_id=1, learning_rate = 0.001, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1):
+    def setupModel(self, cuda_id=1, , dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1):
         # CUDA SETTINGS
         device = torch.device("cuda:{}".format(cuda_id) if torch.cuda.is_available() else "cpu")
         if self.verbose:
@@ -303,18 +303,25 @@ class DeconvolutionExperiment:
         # bind to device
         model.to(device)
 
-        # define optimizer and criterion
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-        criterion = torch.nn.SmoothL1Loss(beta=0.25)
-
-        # attach members as to the model object
-        model.Set("device", device)
-        model.Set("optimizer", optimizer)
-        model.Set("criterion", criterion)
-
         # bind settings and models
         self.device = device
         self.model = model
+
+    def setupOptimizerAndCriterion(learning_rate = 0.001, optimizer=None, criterion=None):
+        # define optimizer and criterion if not set
+        if optimizer == None:
+            optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+        if criterion == None:
+            criterion = torch.nn.SmoothL1Loss(beta=0.25)
+
+        # attach members as to the model object
+        self.model.Set("optimizer", optimizer)
+        self.model.Set("criterion", criterion)
+
+        # bind optimizers
+        self.optimizer = optimizer
+        self.criterion = criterion
 
 
     def loadCheckpoint(self, checkpoint):
