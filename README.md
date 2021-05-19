@@ -26,7 +26,7 @@ Subsequently, run the following pip command from your terminal (in the root of c
 
 The full pipeline (see blow) assumes that you have a scRNA dataset (SC) and spatial transcriptomics dataset (ST) that both are formatted as .h5ad (AnnData data structures). Please see https://anndata.readthedocs.io/ for information about how to structure your data. Alternative you can check out the tutorial [INSERT TUTORIAL LINK] for an example on how to do this.
 
-### Standard pipeline
+### Standard full pipeline
 
 ```python
 import AntiSplodge as AS
@@ -50,6 +50,7 @@ Exp.setupDataLoaders()
 # Initialize Neural network-model and allocate it to the cuda_id specified
 # Use 'cuda_id="cpu"' if you want to allocate it to a cpu
 Exp.setupModel(cuda_id=6)
+Exp.setupOptimizerAndCriterion(learning_rate = 0.001)
 
 # Train the model using the profiles generated 
 # The patience parameter determines how long it will run without fining a new better (lower) error 
@@ -84,6 +85,23 @@ spot_preds = AS.predict(Exp, spots_loader) # predict spots
 # The results for each ST profile (spot) is now in spot_preds and can be used for further analysis 
 ```
 
+### Order of execution
+
+1. **Start an experiment**: `Exp = AS.DeconvolutionExperiment(SC)` must be the first call. 
+
+2. **Define datasets based on the SC dataset**: `Exp.splitTrainTestValidation(train=0.8, rest=0.5)` must be called before 
+`Exp.generateTrainTestValidation(num_profiles=[10000,5000,1000], CD=[1,10])`.
+
+3. **Setup model and optimizers**: `Exp.setupModel(cuda_id=6)` must be called before 
+`Exp.setupOptimizerAndCriterion(learning_rate = 0.001)`. Each time `setupModel` is called, `Exp.setupOptimizerAndCriterion` must be called again, as optimizers and criterions are bound to the model, for use during training. 
+
+4. **Train the model**: `stats = AS.train(Exp, save_file="NNDeconvolver.pt", patience=100)`.
+
+4. **Predict spots using the model**: `spot_preds = AS.predict(Exp, spots_loader)`.
+
+The order of execution must be in the order listed above. 
+
+## Useful snippets
 
 ### Profile generation
 
