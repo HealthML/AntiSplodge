@@ -467,7 +467,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
     print(f"Time elapsed: {(time.time() - t0):.2f} ({(time.time() - t0)/60:.2f} Minutes)")
     if auto_load_model_on_finish:
         print("Autoloading best parameters onto model (auto_load_model_on_finish==True)")
-        experiment:loadCheckpoint(model, save_file) # restore the best checkpoint
+        experiment.loadCheckpoint(save_file) # restore the best checkpoint
 
     return stats
 
