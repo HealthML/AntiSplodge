@@ -120,9 +120,8 @@ Do 10 warm restarts with a low patience (n=5), this will autoload the model per 
 This will make the best model weights be loaded back onto the model and it will try again from these settings
 ```python
 # Do 10 warm restarts 
-for (i in range(10) {
+for i in range(10):
     AS.train(experiment=Exp, patience=5) 
-}
 ```
 
 **3. Lowering learning rate**
@@ -153,13 +152,15 @@ For users having trouble with the memory footprint of the profile generation, it
 ```python
 Exp.splitTrainTestValidation(train=0.8, rest=0.5) # define the dataset splits
 Exp.setupModel(cuda_id=6) # the model can be built beforehand
+best_error = None
 
 # do 100 warm restarts with smaller chunks of training data
-for (i in range(100) {
+for i in range(100):
     Exp.generateTrainTestValidation(num_profiles=[5000,1000,1], CD=[1,10])
     Exp.setupDataLoaders()
-    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) 
-}
+    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10, best_loss=best_error)
+    
+    best_error = np.min(stats['validation_loss']) 
 
 # Remember to generate test profiles after training is complete 
 Exp.generateTrainTestValidation(num_profiles=[1,1,1000], CD=[1,10])
