@@ -119,9 +119,11 @@ AS.train(experiment=Exp, patience=25, save_file=None, auto_load_model_on_finish=
 Do 10 warm restarts with a low patience (n=5), this will autoload the model per train call.
 This will make the best model weights be loaded back onto the model and it will try again from these settings
 ```python
+best_error = None
 # Do 10 warm restarts 
 for i in range(10):
-    AS.train(experiment=Exp, patience=5) 
+    AS.train(experiment=Exp, patience=5, best_loss=best_error)
+    best_error = np.min(stats['validation_loss'])
 ```
 
 **3. Lowering learning rate**
