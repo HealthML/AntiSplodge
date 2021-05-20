@@ -329,7 +329,7 @@ class DeconvolutionExperiment:
 
 
 # patience is the number of epochs before stopping
-def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=True):
+def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=True, best_loss=None):
     # time the function
     t0 = time.time()
 
@@ -357,7 +357,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
     optimizer = model.Get("optimizer")
     criterion = model.Get("criterion")
 
-    p_loss_value = 0 # this will change on the first passthrough
+    p_loss_value = best_loss # this will change on the first passthrough
     p_ = 0 # patience counter
     e_ = 0 # epoch counter
     while p_ < patience+1:
@@ -437,7 +437,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
         vel = val_epoch_loss/(len(val_loader)-val_loss_counter) # reduce by NaNs found
 
         # Check validation loss
-        if e_ == 0: # set target loss value at first epoch
+        if p_loss_value == None: # set target loss value
             p_loss_value = vel
         else:
             # if new loss is better than old then update
