@@ -128,22 +128,26 @@ for (i in range(10) {
 **3. Lowering learning rate**
 
 Start with a high learning rate and lower this by half for each warm restart.
-```python
-lr = 0.01
+```pythonlr = 0.01
+all_stats = []
+best_error = None
 
-Exp.setupModel(cuda_id=6, learning_rate = lr)
-for (i in range(10) {
-    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) 
+# do 5 warm restarts with decreasing learning rate
+for i in range(5):
+    print("Training with learning rate:", lr)
+    Exp.setupOptimizerAndCriterion(learning_rate=lr)
+    lr /= 10 # reduce learning rate by a factor of 10
     
-    # Set learning rate to the half
-    lr /= 2 
-    Exp.setupModel(cuda_id=6, learning_rate = lr)
-    Exp.loadCheckpoint("CurrentDeconvolver.pt") # Set the weights back to the model
-}
+    # For longer training, increase patience threshold
+    stats = AS.train(Exp, save_file="NNDeconvolver.pt", patience=25, best_loss=best_error) 
+    all_stats.extend(stats)
+    
+    best_error = np.min(stats['validation_loss']) # set best error as the target error to beat
+    # the results in stats is the training errors during in each epoch (which might be needed for training plots)
 ```
 
 
-**4. Running on systems with reduced memory**
+**4. Running on systems with reduced memory using smaller sets of training data **
 
 For users having trouble with the memory footprint of the profile generation, it is possible to generate smaller sets of training and validation profiles. 
 ```python
