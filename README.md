@@ -129,7 +129,8 @@ for i in range(10):
 **3. Lowering learning rate**
 
 Start with a high learning rate and lower this by half for each warm restart.
-```pythonlr = 0.01
+```python
+lr = 0.01
 all_stats = []
 best_error = None
 
