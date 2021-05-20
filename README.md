@@ -148,8 +148,7 @@ for i in range(5):
     # the results in stats is the training errors during in each epoch (which might be needed for training plots)
 ```
 
-
-**4. Running on systems with reduced memory using smaller sets of training data **
+**4. Running on systems with reduced memory using smaller sets of training data**
 
 For users having trouble with the memory footprint of the profile generation, it is possible to generate smaller sets of training and validation profiles. 
 ```python
