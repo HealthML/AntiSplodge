@@ -173,8 +173,7 @@ Exp.generateTrainTestValidation(num_profiles=[1,1,1000], CD=[1,10])
 ### Use profiles and train the network with low memory and warm restarts 
 
 ### Tutorial
-Check out the tutorial [INSERT TUTORIAL LINK].
-See tutorials.
+Check out the tutorial located at: https://github.com/HealthML/AntiSplodge_Turorial. This will give you a full tour from preprocessing to deconvoluting to predicting cell type proportions of the spatial transcriptomics spots.
 
 ## Dependencies
 
@@ -191,6 +190,8 @@ The list of major dependencies are:
 The documentation will be available at https://antisplode.readthedocs.io/.
 
 ## References
+
+Coming soon.
 
 ## License
 
