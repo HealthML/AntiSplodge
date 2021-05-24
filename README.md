@@ -103,8 +103,6 @@ The order of execution must be in the order listed above.
 
 ## Useful snippets
 
-### Profile generation
-
 ### Several ways of training 
 
 **1. Standard training**
@@ -169,8 +167,6 @@ Exp.generateTrainTestValidation(num_profiles=[1,1,1000], CD=[1,10])
 
 # Continue as usual
 ```
-
-### Use profiles and train the network with low memory and warm restarts 
 
 ### Tutorial
 Check out the tutorial located at: https://github.com/HealthML/AntiSplodge_Turorial. This will give you a full tour from preprocessing to deconvoluting to predicting cell type proportions of the spatial transcriptomics spots.
