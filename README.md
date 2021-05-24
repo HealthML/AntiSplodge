@@ -24,7 +24,7 @@ Subsequently, run the following pip command from your terminal (in the root of c
 
 ## Usage
 
-The full pipeline (see blow) assumes that you have a scRNA dataset (SC) and spatial transcriptomics dataset (ST) that both are formatted as .h5ad (AnnData data structures). Please see https://anndata.readthedocs.io/ for information about how to structure your data. Alternative you can check out the tutorial [INSERT TUTORIAL LINK] for an example on how to do this.
+The full pipeline (see blow) assumes that you have a scRNA dataset (SC) and spatial transcriptomics dataset (ST) that both are formatted as .h5ad (AnnData data structures). Please see https://anndata.readthedocs.io/ for information about how to structure your data. Alternative you can check out the tutorial https://github.com/HealthML/AntiSplodge_Turorial for an example on how to do this.
 
 ### Standard full pipeline
 
