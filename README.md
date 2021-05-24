@@ -1,6 +1,6 @@
 # AntiSplodge ![MIT License](https://img.shields.io/badge/license-MIT%20License-blue.svg) ![CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-blue.svg)
 
-More information soon.
+**AntiSplodge**, is a simple feed-forward neural network-based pipeline, designed to effective deconvolute spatial transcriptomics profiles, in an easy, fast, and, intuitive manner. It comes with all functions required to do a full deconvolution, from sampling synthetic spot profiles required to train the neural network, to the methods required to train the supplied network architecture. It is neatly packed into functions calls similar to that of traditional R-packages, where users are only exposed to fiddling with hyperparameters.
 
 ## Installation
 
@@ -24,7 +24,7 @@ Subsequently, run the following pip command from your terminal (in the root of c
 
 ## Usage
 
-The full pipeline (see blow) assumes that you have a scRNA dataset (SC) and spatial transcriptomics dataset (ST) that both are formatted as .h5ad (AnnData data structures). Please see https://anndata.readthedocs.io/ for information about how to structure your data. Alternative you can check out the tutorial [INSERT TUTORIAL LINK] for an example on how to do this.
+The full pipeline (see blow) assumes that you have a scRNA dataset (SC) and spatial transcriptomics dataset (ST) that both are formatted as .h5ad (AnnData data structures). Please see https://anndata.readthedocs.io/ for information about how to structure your data. Alternative you can check out the tutorial https://github.com/HealthML/AntiSplodge_Turorial for an example on how to do this.
 
 ### Standard full pipeline
 
@@ -103,8 +103,6 @@ The order of execution must be in the order listed above.
 
 ## Useful snippets
 
-### Profile generation
-
 ### Several ways of training 
 
 **1. Standard training**
@@ -119,10 +117,11 @@ AS.train(experiment=Exp, patience=25, save_file=None, auto_load_model_on_finish=
 Do 10 warm restarts with a low patience (n=5), this will autoload the model per train call.
 This will make the best model weights be loaded back onto the model and it will try again from these settings
 ```python
+best_error = None
 # Do 10 warm restarts 
-for (i in range(10) {
-    AS.train(experiment=Exp, patience=5) 
-}
+for i in range(10):
+    AS.train(experiment=Exp, patience=5, best_loss=best_error)
+    best_error = np.min(stats['validation_loss'])
 ```
 
 **3. Lowering learning rate**
@@ -130,32 +129,38 @@ for (i in range(10) {
 Start with a high learning rate and lower this by half for each warm restart.
 ```python
 lr = 0.01
+all_stats = []
+best_error = None
 
-Exp.setupModel(cuda_id=6, learning_rate = lr)
-for (i in range(10) {
-    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) 
+# do 5 warm restarts with decreasing learning rate
+for i in range(5):
+    print("Training with learning rate:", lr)
+    Exp.setupOptimizerAndCriterion(learning_rate=lr)
+    lr /= 10 # reduce learning rate by a factor of 10
     
-    # Set learning rate to the half
-    lr /= 2 
-    Exp.setupModel(cuda_id=6, learning_rate = lr)
-    Exp.loadCheckpoint("CurrentDeconvolver.pt") # Set the weights back to the model
-}
+    # For longer training, increase patience threshold
+    stats = AS.train(Exp, save_file="NNDeconvolver.pt", patience=25, best_loss=best_error) 
+    all_stats.extend(stats)
+    
+    best_error = np.min(stats['validation_loss']) # set best error as the target error to beat
+    # the results in stats is the training errors during in each epoch (which might be needed for training plots)
 ```
 
-
-**4. Running on systems with reduced memory**
+**4. Running on systems with reduced memory using smaller sets of training data**
 
 For users having trouble with the memory footprint of the profile generation, it is possible to generate smaller sets of training and validation profiles. 
 ```python
 Exp.splitTrainTestValidation(train=0.8, rest=0.5) # define the dataset splits
 Exp.setupModel(cuda_id=6) # the model can be built beforehand
+best_error = None
 
 # do 100 warm restarts with smaller chunks of training data
-for (i in range(100) {
+for i in range(100):
     Exp.generateTrainTestValidation(num_profiles=[5000,1000,1], CD=[1,10])
     Exp.setupDataLoaders()
-    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10) 
-}
+    AS.train(experiment=Exp, save_file="CurrentDeconvolver.pt", patience=10, best_loss=best_error)
+    
+    best_error = np.min(stats['validation_loss']) 
 
 # Remember to generate test profiles after training is complete 
 Exp.generateTrainTestValidation(num_profiles=[1,1,1000], CD=[1,10])
@@ -163,11 +168,8 @@ Exp.generateTrainTestValidation(num_profiles=[1,1,1000], CD=[1,10])
 # Continue as usual
 ```
 
-### Use profiles and train the network with low memory and warm restarts 
-
 ### Tutorial
-Check out the tutorial [INSERT TUTORIAL LINK].
-See tutorials.
+Check out the tutorial located at: https://github.com/HealthML/AntiSplodge_Turorial. This will give you a full tour from preprocessing to deconvoluting by predicting cell type proportions of the spatial transcriptomics spots.
 
 ## Dependencies
 
@@ -184,6 +186,8 @@ The list of major dependencies are:
 The documentation will be available at https://antisplode.readthedocs.io/.
 
 ## References
+
+Coming soon.
 
 ## License
 
