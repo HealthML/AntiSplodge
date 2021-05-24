@@ -183,7 +183,7 @@ The list of major dependencies are:
 
 ## Documentation
 
-The documentation will be available at https://antisplode.readthedocs.io/.
+The documentation is available at: https://antisplodge.readthedocs.io/.
 
 ## References
 
