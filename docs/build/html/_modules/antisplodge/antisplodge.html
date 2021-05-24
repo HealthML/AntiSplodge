@@ -1,0 +1,877 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>antisplodge.antisplodge &mdash; AntiSplodge 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> AntiSplodge
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../antisplodge.html">antisplodge package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">AntiSplodge</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>antisplodge.antisplodge</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for antisplodge.antisplodge</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">WeightedRandomSampler</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<div class="viewcode-block" id="multinomialSampler"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.multinomialSampler">[docs]</a><span class="k">def</span> <span class="nf">multinomialSampler</span><span class="p">(</span><span class="n">Nc</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">CD_min</span><span class="p">,</span> <span class="n">CD_max</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A multinomial sampler with a temperatured step function, making sampling of classes/cell types go from equally likely to more extreme (singleton-like).</span>
+
+<span class="sd">    :param Nc: The number of cell types. Usually in the range of 5-50.</span>
+<span class="sd">    :type Nc: int</span>
+<span class="sd">    :param M: The number of profiles generated, for each `CD`.  see `CD_min` and `CD_max` for more information.</span>
+<span class="sd">    :type M: int</span>
+<span class="sd">    :param CD_min: CD is cell density, and it is the measure of how many cells contribute to a particular profile. `CD_min` is the miniumum number of cells contributing to a profile, and together with `CD_max` they form a range of CDs, going from `CD_min` to `CD_max`.</span>
+<span class="sd">    :type CD_min: int</span>
+<span class="sd">    :param CD_max: CD is cell density, and it is the measure of how many cells contribute to a particular profile. `CD_max` is the maximum number of cells contributing to a profile, and together with `CD_min` they form a range of CDs, going from `CD_min` to `CD_max`.</span>
+<span class="sd">    :type CD_max: int</span>
+<span class="sd">    :return: Return a list of profiles, with the number of profiles equal to `Nc x M x (CD_max - CD_min + 1)`. Each profile contains a count value (positive integer, including 0) for each class/cell type.</span>
+<span class="sd">    :rtype: List</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">profiles</span><span class="o">=</span><span class="p">[]</span>
+    <span class="c1"># Sample across cell densites (S)</span>
+    <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">CD_min</span><span class="p">,</span> <span class="n">CD_max</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">temp_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="c1"># Assign temperatures</span>
+            <span class="n">temps</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nc</span><span class="p">):</span>
+                <span class="n">power</span> <span class="o">=</span> <span class="p">(</span><span class="n">S</span><span class="o">**</span><span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="p">((</span><span class="n">temp_</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">M</span><span class="p">))</span> <span class="c1"># temp_ goes from 0 to M-1</span>
+                <span class="n">temps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
+            <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">temps</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">temps</span><span class="p">)</span> <span class="c1"># Scale temperatures to 1</span>
+            <span class="c1"># Extract M samples for current temperature step</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span>
+            <span class="c1"># shuffle weights among cell types indices</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+            <span class="n">profiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">profiles</span></div>
+
+<div class="viewcode-block" id="getConvolutedProfilesFromDistributions"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.getConvolutedProfilesFromDistributions">[docs]</a><span class="k">def</span> <span class="nf">getConvolutedProfilesFromDistributions</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">cell_types</span><span class="p">,</span> <span class="n">cell_type_key</span><span class="p">,</span> <span class="n">distributions</span><span class="p">,</span> <span class="n">normalize_X</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A function that converts the profiles generated with `multinomialSampler`, into gene-based profiles by sampling cells from the `SC` dataset, corresponding to the number of counts found in each profile.</span>
+
+<span class="sd">    :param adata: An AnnData object, this is usually the `SC` dataset, in the experiment class `DeconvolutionExperiment`.</span>
+<span class="sd">    :type adata: AnnData</span>
+<span class="sd">    :param cell_types: A ordered list of cell types, found in `adata`s `cell_type_key`.</span>
+<span class="sd">    :type cell_types: List</span>
+<span class="sd">    :param cell_type_key: The key/column found in `adata`, the method will look for in the observations (`obs`) data frame.</span>
+<span class="sd">    :type cell_type_key: str</span>
+<span class="sd">    :param distributions: The profiles that should be processed to be convoluted, usually generated using `multinomialSampler`.</span>
+<span class="sd">    :type distributions: [ParamType]</span>
+<span class="sd">    :param normalize_X: If `True`, each convoluted profile is scaled to sum to 1 (assuming cell types already are scaled to 1), defaults to False.</span>
+<span class="sd">    :type normalize_X: bool (False, optional)</span>
+<span class="sd">    :return: A dict containing three lists. `X_list`, a gene-based list of convoluted profiles, each profile is a list of genes. `Y_list`, a list of cell types used to produce `X_list`, each element is class-based list. `I_list`, a list of indicies, to traceback what cells were used to generate the `X_list`. Each list is index-based related, so the first element of `X_list` is related to the first element of `Y_list` and the first element of `I_list`.</span>
+<span class="sd">    :rtype: Dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># make a copy of the adata</span>
+    <span class="n">adata_copy</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># pre subset cell_types save expensive operations</span>
+    <span class="n">cell_types_cache</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">desified_X_cache</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
+        <span class="n">cell_types_cache</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata_copy</span><span class="p">[</span><span class="n">adata_copy</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">cell_type_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">cell_type</span><span class="p">,:]</span>
+        <span class="n">desified_X_cache</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_types_cache</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+
+    <span class="c1"># sample Xs and Ys, and record indices used to redo the profiles</span>
+    <span class="n">X_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">Y_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">I_list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># indices</span>
+    <span class="k">for</span> <span class="n">dist_</span> <span class="ow">in</span> <span class="n">distributions</span><span class="p">:</span>
+        <span class="n">cur_x</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cur_y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cur_I</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dist_</span><span class="p">)):</span>
+            <span class="n">type_</span> <span class="o">=</span> <span class="n">cell_types</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">amount</span> <span class="o">=</span> <span class="n">dist_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="c1">#print(i, type_, amount)</span>
+
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">cell_types_cache</span><span class="p">[</span><span class="n">type_</span><span class="p">]</span><span class="o">.</span><span class="n">n_obs</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
+            <span class="c1">#print(&quot;indices:&quot;, indices)</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+                <span class="n">cur_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">desified_X_cache</span><span class="p">[</span><span class="n">type_</span><span class="p">][</span><span class="n">index</span><span class="p">,:])</span>
+                <span class="n">cur_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
+                <span class="n">cur_I</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">type_</span><span class="p">,</span> <span class="n">index</span><span class="p">])</span> <span class="c1"># use two keys for indexing based on cached cell-type</span>
+
+
+        <span class="c1"># scale x by counts in y</span>
+        <span class="n">cur_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cur_x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># only sum (this is discarded) -&gt; /len(cur_y)</span>
+        <span class="c1"># normalize X to the same scale, independant of cell density</span>
+        <span class="k">if</span> <span class="n">normalize_X</span><span class="p">:</span>
+            <span class="n">cur_x</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_y</span><span class="p">)</span>
+
+
+        <span class="c1"># convert to numpy</span>
+        <span class="n">cur_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cur_x</span><span class="p">)</span>
+        <span class="n">cur_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cur_y</span><span class="p">)</span>
+
+        <span class="c1"># add x and y</span>
+        <span class="n">X_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_x</span><span class="p">)</span>
+        <span class="n">Y_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_y</span><span class="p">)</span>
+        <span class="n">I_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_I</span><span class="p">)</span>
+
+    <span class="c1"># return all three lists</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">X_list</span><span class="p">,</span> <span class="n">Y_list</span><span class="p">,</span> <span class="n">I_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getProportionFromCountVector"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.getProportionFromCountVector">[docs]</a><span class="k">def</span> <span class="nf">getProportionFromCountVector</span><span class="p">(</span><span class="n">Y_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A function that will convert the count vectors into proportions. This is used to go from count vectors of cell types to proportions of cell types. Each profile will sum to 1.</span>
+
+<span class="sd">    :param Y_list: Converts count profiles to proportion profiles.</span>
+<span class="sd">    :type Y_list: List</span>
+<span class="sd">    :return: A list of proportion profiles.</span>
+<span class="sd">    :rtype: List</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret_list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># return list</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Y_list</span><span class="p">)):</span>
+        <span class="c1"># this is a single profile</span>
+        <span class="n">cur_elem</span> <span class="o">=</span> <span class="n">Y_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># total count of the profile</span>
+        <span class="n">total_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cur_elem</span><span class="p">)</span>
+        <span class="c1"># element-wise scale to proportion in the profile</span>
+        <span class="n">ret_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_elem</span><span class="o">/</span><span class="n">total_cells</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ret_list</span></div>
+
+
+<div class="viewcode-block" id="SingleCellDataset"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.SingleCellDataset">[docs]</a><span class="k">class</span> <span class="nc">SingleCellDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple class used to store X and y relations as a paired dataset.</span>
+<span class="sd">    We use it to store gene-based profiles (X) that are related to class-based profiles (y).</span>
+<span class="sd">    This function is used to store tensors intended to train, validate or test the models generated.</span>
+
+<span class="sd">    :param X_data: A tensor where each element is a list of gene counts or gene proportions.</span>
+<span class="sd">    :type X_data: Tensor</span>
+<span class="sd">    :param Y_data: A tensor where each element is a list of cell type counts or cell type proportions</span>
+<span class="sd">    :type Y_data: Tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_data</span> <span class="o">=</span> <span class="n">X_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_data</span> <span class="o">=</span> <span class="n">y_data</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_data</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CelltypeDeconvolver"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.CelltypeDeconvolver">[docs]</a><span class="k">class</span> <span class="nc">CelltypeDeconvolver</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class extending the `nn.Module` from pytorch.</span>
+
+<span class="sd">    :param num_feature: Number of input elements/features (usually gene-based).</span>
+<span class="sd">    :type num_feature: int</span>
+<span class="sd">    :param num_class: Number of output elements, usually cell types or similr classes.</span>
+<span class="sd">    :type num_class: int</span>
+<span class="sd">    :param number_of_layers_per_part: Number of hidden layers per layer block/part.</span>
+<span class="sd">    :type number_of_layers_per_part: int</span>
+<span class="sd">    :param first_part_size: Number of neurons per layer in the first block/part.</span>
+<span class="sd">    :type first_part_size: int</span>
+<span class="sd">    :param second_part_size: Number of neurons per layer in the second block/part.</span>
+<span class="sd">    :type second_part_size: int</span>
+<span class="sd">    :param last_part_size: Number of neurons per layer in the last block/part.</span>
+<span class="sd">    :type last_part_size: int</span>
+<span class="sd">    :param out_part_size: Number of neurons in the last layer immediate before the final output layer.</span>
+<span class="sd">    :type out_part_size: int</span>
+<span class="sd">    :param input_dropout: Dropout in the input layer, used to simulate spareness or missing genes during training.</span>
+<span class="sd">    :type input_dropout: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_feature</span><span class="p">,</span> <span class="n">num_class</span><span class="p">,</span> <span class="n">number_of_layers_per_part</span><span class="p">,</span> <span class="n">first_part_size</span><span class="p">,</span> <span class="n">second_part_size</span><span class="p">,</span> <span class="n">last_part_size</span><span class="p">,</span> <span class="n">out_part_size</span><span class="p">,</span> <span class="n">input_dropout</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CelltypeDeconvolver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># helpers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_params</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+        <span class="c1"># stores all layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+
+        <span class="c1"># go from features to first part</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">input_dropout</span><span class="p">))</span> <span class="c1"># add dropout to simulate sparseness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_feature</span><span class="p">,</span> <span class="n">first_part_size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">())</span>
+
+        <span class="c1"># part 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">first_part_size</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_layers_per_part</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">first_part_size</span><span class="p">,</span> <span class="n">first_part_size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">first_part_size</span><span class="p">,</span> <span class="n">second_part_size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">())</span>
+
+        <span class="c1"># part 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">second_part_size</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_layers_per_part</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">second_part_size</span><span class="p">,</span> <span class="n">second_part_size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">second_part_size</span><span class="p">,</span> <span class="n">last_part_size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">())</span>
+
+        <span class="c1"># part 3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">last_part_size</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_layers_per_part</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">last_part_size</span><span class="p">,</span> <span class="n">last_part_size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">last_part_size</span><span class="p">,</span> <span class="n">out_part_size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">())</span>
+        <span class="c1">#self.layers.append(nn.Dropout(p=0.1))</span>
+
+        <span class="c1"># go from last part to num classes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">out_part_size</span><span class="p">,</span> <span class="n">num_class</span><span class="p">))</span>
+        <span class="c1"># leaky relu used to penalize values below 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">negative_slope</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
+
+<div class="viewcode-block" id="CelltypeDeconvolver.forward"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.CelltypeDeconvolver.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="c1"># iterate through all defined layers</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="CelltypeDeconvolver.Set"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.CelltypeDeconvolver.Set">[docs]</a>    <span class="k">def</span> <span class="nf">Set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Used to store members in the class&#39;s `member` dictionary.</span>
+
+<span class="sd">        :param key: Key in the `member` dictionary.</span>
+<span class="sd">        :type key: str</span>
+<span class="sd">        :param val: Value to be stored.</span>
+<span class="sd">        :type val: Anything</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="CelltypeDeconvolver.Get"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.CelltypeDeconvolver.Get">[docs]</a>    <span class="k">def</span> <span class="nf">Get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Used to retrieve members in the class&#39;s `member` dictionary.</span>
+
+<span class="sd">        :param key: Key in the `member` dictionary.</span>
+<span class="sd">        :type key: str</span>
+<span class="sd">        :return: Returns the value of the member.</span>
+<span class="sd">        :rtype: Anything</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div></div>
+
+<div class="viewcode-block" id="DeconvolutionExperiment"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment">[docs]</a><span class="k">class</span> <span class="nc">DeconvolutionExperiment</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A deconvolution experiment class used to keep track of everything that is required to do a full AntiSplodge experiment.</span>
+
+<span class="sd">    :param SC: A single-cell dataset, formatted as an AnnData object.</span>
+<span class="sd">    :type SC: AnnData</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SC</span><span class="p">):</span>
+        <span class="c1"># h5ad/AnnData formated single-cell dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SC</span> <span class="o">=</span> <span class="n">SC</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">celltypes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="DeconvolutionExperiment.setVerbosity"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setVerbosity">[docs]</a>    <span class="k">def</span> <span class="nf">setVerbosity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the verbosity level of the prints of the experiment, either True or False.</span>
+
+<span class="sd">        :param verbose: Verboisty of the prints (True or False), this is False when the experiment is inititalized.</span>
+<span class="sd">        :type verbose: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span></div>
+
+<div class="viewcode-block" id="DeconvolutionExperiment.setCellTypeColumn"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setCellTypeColumn">[docs]</a>    <span class="k">def</span> <span class="nf">setCellTypeColumn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Column in the `SC` dataset, that holds the cell types. This create members: `celltypes_column`, `celltypes`, `num_classes`.</span>
+
+<span class="sd">        :param name: Name (key) of the column.</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">celltypes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SC</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">celltypes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DeconvolutionExperiment.splitTrainTestValidation"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.splitTrainTestValidation">[docs]</a>    <span class="k">def</span> <span class="nf">splitTrainTestValidation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">rest</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split the `SC` dataset into training, validation and test dataset, the splits are strattified on the cell types.</span>
+<span class="sd">        This create members: `trainIndex`, `valIndex`, `testIndex`, `SC_train`, `SC_val`, `SC_test`.</span>
+
+<span class="sd">        :param train: A number between 0 and 1 controlling the proportion of samples used in the training dataset, defaults to 0.9 (90%)</span>
+<span class="sd">        :type train: float (0.9, optional)</span>
+<span class="sd">        :param rest: A number between 0 and 1 controlling the proportion of samples used in the training dataset (the rest will be in the validation dataset), defaults to 0.5 (A 50%/50% split)</span>
+<span class="sd">        :type rest: float (0.5, optional)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#</span>
+        <span class="c1"># Split into train and rest</span>
+        <span class="c1">#</span>
+        <span class="n">TrainIndex</span><span class="p">,</span> <span class="n">RestIndex</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">SC</span><span class="o">.</span><span class="n">n_obs</span><span class="p">),</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">SC</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span><span class="p">],</span>
+                                                       <span class="n">test_size</span><span class="o">=</span><span class="mi">1</span><span class="o">-</span><span class="n">train</span><span class="p">,</span>
+                                                       <span class="n">stratify</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">SC</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span><span class="p">])</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Use the rest to split into validation and test</span>
+        <span class="c1">#</span>
+        <span class="n">SC_rest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SC</span><span class="p">[</span><span class="n">RestIndex</span><span class="p">,:]</span>
+        <span class="n">ValIndex</span><span class="p">,</span> <span class="n">TestIndex</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">SC_rest</span><span class="o">.</span><span class="n">n_obs</span><span class="p">),</span>
+                                                     <span class="n">SC_rest</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span><span class="p">],</span>
+                                                     <span class="n">test_size</span><span class="o">=</span><span class="n">rest</span><span class="p">,</span>
+                                                     <span class="n">stratify</span><span class="o">=</span><span class="n">SC_rest</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span><span class="p">])</span>
+        <span class="c1"># Final AnnData objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainIndex</span> <span class="o">=</span> <span class="n">TrainIndex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valIndex</span> <span class="o">=</span> <span class="n">ValIndex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">testIndex</span> <span class="o">=</span> <span class="n">TestIndex</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">SC_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SC</span><span class="p">[</span><span class="n">TrainIndex</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SC_val</span> <span class="o">=</span> <span class="n">SC_rest</span><span class="p">[</span><span class="n">ValIndex</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SC_test</span> <span class="o">=</span> <span class="n">SC_rest</span><span class="p">[</span><span class="n">TestIndex</span><span class="p">,:]</span></div>
+
+<div class="viewcode-block" id="DeconvolutionExperiment.generateTrainTestValidation"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.generateTrainTestValidation">[docs]</a>    <span class="k">def</span> <span class="nf">generateTrainTestValidation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_profiles</span><span class="p">,</span> <span class="n">CD</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate training, testing, and, validation profiles.</span>
+<span class="sd">        This function will call `multinomialSampler`, `getConvolutedProfilesFromDistributions`, and, `getProportionFromCountVector`, in that order, for each dataset.</span>
+<span class="sd">        This create members: `X_train_counts`, `X_val_counts`, `X_test_counts`, `X_train`, `X_val`, `X_test`, `Y_train`, `Y_val`, `Y_test`, `Y_train_prop`, `Y_val_prop`, `Y_test_prop`, `num_features`.</span>
+
+<span class="sd">        :param num_profiles: A list of lengths 3, controlling the number of profiles used for training, testing, and, validation (index 0, 1, and, 2, respectively).</span>
+<span class="sd">        :type num_profiles: list of ints, length = 3</span>
+<span class="sd">        :param CD: A list of lengths 2, controlling the number of cell densities used (index 0 is the minimum number of CDs, and index 1 is the maximum number of CDs). The same CD will be used for the training, testing, and, validation dataset, respectively.</span>
+<span class="sd">        :type CD: list of ints, length = 2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># SAMPLE PROFILES</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GENERATING PROFILES&quot;</span><span class="p">)</span>
+        <span class="n">X_train_profiles</span> <span class="o">=</span> <span class="n">multinomialSampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_profiles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CD</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CD</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">X_val_profiles</span> <span class="o">=</span>   <span class="n">multinomialSampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_profiles</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">CD</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CD</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">X_test_profiles</span> <span class="o">=</span>  <span class="n">multinomialSampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_profiles</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">CD</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CD</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GENERATING TRAIN DATASET (N=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train_profiles</span><span class="p">)))</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">I_</span> <span class="o">=</span> <span class="n">getConvolutedProfilesFromDistributions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SC_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltypes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span><span class="p">,</span> <span class="n">X_train_profiles</span><span class="p">,</span> <span class="n">normalize_X</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Y_train_prop</span> <span class="o">=</span> <span class="n">getProportionFromCountVector</span><span class="p">(</span><span class="n">X_train_profiles</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GENERATING VALIDATION DATASET (N=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_val_profiles</span><span class="p">)))</span>
+        <span class="n">X_val</span><span class="p">,</span> <span class="n">Y_val</span><span class="p">,</span> <span class="n">I_</span> <span class="o">=</span>     <span class="n">getConvolutedProfilesFromDistributions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SC_val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltypes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span><span class="p">,</span> <span class="n">X_val_profiles</span><span class="p">,</span> <span class="n">normalize_X</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Y_val_prop</span> <span class="o">=</span> <span class="n">getProportionFromCountVector</span><span class="p">(</span><span class="n">X_val_profiles</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GENERATING TEST DATASET (N=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test_profiles</span><span class="p">)))</span>
+        <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span> <span class="n">I_</span> <span class="o">=</span>   <span class="n">getConvolutedProfilesFromDistributions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SC_test</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltypes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltypes_column</span><span class="p">,</span> <span class="n">X_test_profiles</span><span class="p">,</span> <span class="n">normalize_X</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Y_test_prop</span> <span class="o">=</span> <span class="n">getProportionFromCountVector</span><span class="p">(</span><span class="n">X_test_profiles</span><span class="p">)</span>
+
+        <span class="c1"># bind counts, proportions and convoluted profiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_train_counts</span> <span class="o">=</span> <span class="n">X_train_profiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_val_counts</span> <span class="o">=</span> <span class="n">X_val_profiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_test_counts</span> <span class="o">=</span> <span class="n">X_test_profiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_val</span> <span class="o">=</span> <span class="n">X_val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y_train</span> <span class="o">=</span> <span class="n">Y_train</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y_val</span> <span class="o">=</span> <span class="n">Y_val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y_test</span> <span class="o">=</span> <span class="n">Y_test</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y_train_prop</span> <span class="o">=</span> <span class="n">Y_train_prop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y_val_prop</span> <span class="o">=</span> <span class="n">Y_val_prop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y_test_prop</span> <span class="o">=</span> <span class="n">Y_test_prop</span>
+
+        <span class="c1"># set features to the number of elements in X_train</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DeconvolutionExperiment.setupDataLoaders"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setupDataLoaders">[docs]</a>    <span class="k">def</span> <span class="nf">setupDataLoaders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Will process the profiles generated by the `generateTrainTestValidation` method into ready-to-use data loaders. This create members: `train_loader`, `val_loader`, `test_loader`.</span>
+
+<span class="sd">        :param batch_size: The number of samples in each batch, defaults to 1000</span>
+<span class="sd">        :type batch_size: int (1000, optional)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># batch size for data loaders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+
+        <span class="n">dataset_train</span> <span class="o">=</span> <span class="n">SingleCellDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y_train_prop</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+        <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">dataset_train</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="n">dataset_val</span> <span class="o">=</span> <span class="n">SingleCellDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_val</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y_val_prop</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+        <span class="n">val_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">dataset_val</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="n">dataset_test</span> <span class="o">=</span> <span class="n">SingleCellDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_test</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y_test_prop</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+        <span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">dataset_test</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span>
+            <span class="c1"># we don&#39;t shuffle test data</span>
+        <span class="p">)</span>
+
+        <span class="c1"># bind loaders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_loader</span> <span class="o">=</span> <span class="n">train_loader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> <span class="o">=</span> <span class="n">val_loader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span> <span class="o">=</span> <span class="n">test_loader</span></div>
+
+<div class="viewcode-block" id="DeconvolutionExperiment.setupModel"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setupModel">[docs]</a>    <span class="k">def</span> <span class="nf">setupModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cuda_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">sps</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">lps</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">lp</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the feed forward neural network model. We recommend about half number of nodes per part for each subsequent layer part.</span>
+<span class="sd">        The first layer should be smaller than the input. Check out the member variable `num_features`.</span>
+<span class="sd">        This create members: `model`, `device`.</span>
+
+<span class="sd">        :param cuda_id: The id of the CUDA device, this can be either an int for the id or &quot;cpu&quot; (to use CPU device), defaults to 1</span>
+<span class="sd">        :type cuda_id: int (or &quot;cpu&quot;) (1, optional)</span>
+<span class="sd">        :param dropout: [ParamDescription], defaults to 0.33</span>
+<span class="sd">        :type dropout: float (0.33, optional)</span>
+<span class="sd">        :param fps: Nodes for each layer for the first part/block, defaults to 512</span>
+<span class="sd">        :type fps: int (512, optional)</span>
+<span class="sd">        :param sps: Nodes for each layer for the second part/block, defaults to 256</span>
+<span class="sd">        :type sps: int (256, optional)</span>
+<span class="sd">        :param lps: Nodes for each layer for the last part/block, defaults to 128</span>
+<span class="sd">        :type lps: int (128, optional)</span>
+<span class="sd">        :param ops: Number of nodes in the last hidden layer just before the output layer, defaults to 64</span>
+<span class="sd">        :type ops: int (64, optional)</span>
+<span class="sd">        :param lp: Layers per part/block, defaults to 1</span>
+<span class="sd">        :type lp: int (1, optional)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># CUDA SETTINGS</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cuda_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(CUDA) device is: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+        <span class="c1"># setup the NN model</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CelltypeDeconvolver</span><span class="p">(</span>
+            <span class="n">num_feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span><span class="p">,</span>
+            <span class="n">num_class</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+            <span class="n">number_of_layers_per_part</span> <span class="o">=</span> <span class="n">lp</span><span class="p">,</span>
+            <span class="n">first_part_size</span> <span class="o">=</span> <span class="n">fps</span><span class="p">,</span>
+            <span class="n">second_part_size</span> <span class="o">=</span> <span class="n">sps</span><span class="p">,</span>
+            <span class="n">last_part_size</span> <span class="o">=</span> <span class="n">lps</span><span class="p">,</span>
+            <span class="n">out_part_size</span> <span class="o">=</span> <span class="n">ops</span><span class="p">,</span>
+            <span class="n">input_dropout</span> <span class="o">=</span> <span class="n">dropout</span>
+        <span class="p">)</span>
+        <span class="c1"># bind to device</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">Set</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># bind settings and models</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span></div>
+
+<div class="viewcode-block" id="DeconvolutionExperiment.setupOptimizerAndCriterion"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setupOptimizerAndCriterion">[docs]</a>    <span class="k">def</span> <span class="nf">setupOptimizerAndCriterion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the optimizer and criterion, and bind it to the model. This create members: `optimizer`, `criterion`.</span>
+
+<span class="sd">        :param learning_rate: The learning rate of the optimizer, if you supply another optimizer, remember to set it yourself, defaults to 0.001</span>
+<span class="sd">        :type learning_rate: float (0.001, optional)</span>
+<span class="sd">        :param optimizer: The neural network optimizer, defaults to `None`, and will then use pytorch&#39;s `optim.Adam`.</span>
+<span class="sd">        :type optimizer: Pytorch optimizer (None, optional)</span>
+<span class="sd">        :param criterion: The neural network criterion, defaults to `None`, and will then use pytorch&#39;s `nn.SmoothL1Loss`.</span>
+<span class="sd">        :type criterion: Pytorch criterion or loss function (None, optional)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># define optimizer and criterion if not set</span>
+        <span class="k">if</span> <span class="n">optimizer</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">criterion</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">SmoothL1Loss</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+
+        <span class="c1"># attach members as to the model object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">Set</span><span class="p">(</span><span class="s2">&quot;optimizer&quot;</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">Set</span><span class="p">(</span><span class="s2">&quot;criterion&quot;</span><span class="p">,</span> <span class="n">criterion</span><span class="p">)</span>
+
+        <span class="c1"># bind optimizers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span></div>
+
+
+<div class="viewcode-block" id="DeconvolutionExperiment.loadCheckpoint"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.loadCheckpoint">[docs]</a>    <span class="k">def</span> <span class="nf">loadCheckpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads a checkpoint file (.pt) containing the state of a neural network onto the `model` member variable.</span>
+
+<span class="sd">        :param checkpoint: The path to the checkpoint file</span>
+<span class="sd">        :type checkpoint: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Restoring checkpoint:&quot;</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="train"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.train">[docs]</a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auto_load_model_on_finish</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">best_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Train the model found in an experiment, this will utilize the train and validation dataset.</span>
+
+<span class="sd">    :param patience: Patience counter, the training will stop once a new better loss hasn&#39;t been seen in the last `patience` epochs, defaults to 25</span>
+<span class="sd">    :type patience: int (25, optional)</span>
+<span class="sd">    :param save_file: The file to save the model parameters each time a better setting has been found. This is done each time the validation error is better (lower) than the best seen. Defaults to None, in which case a time-stamped file will be used.</span>
+<span class="sd">    :type save_file: str or None (None, optional)</span>
+<span class="sd">    :param auto_load_model_on_finish: If the best model settings should be loaded back onto the model when the training stops, defaults to True</span>
+<span class="sd">    :type auto_load_model_on_finish: bool (True, optional)</span>
+<span class="sd">    :param best_loss: A loss function to beat in order to save the model as the new best, used for warm restarts, defaults to None.</span>
+<span class="sd">    :type best_loss: float or None (None, optional)</span>
+<span class="sd">    :return: A dictionary with keys: `train_loss` and `validation_loss`, containing the train and validation loss for each epoch.</span>
+<span class="sd">    :rtype: Dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># time the function</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># retrieve experiment elements</span>
+    <span class="n">model</span>        <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">model</span>
+    <span class="n">train_loader</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">train_loader</span>
+    <span class="n">val_loader</span>   <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">val_loader</span>
+
+    <span class="c1"># a save file is generated if not specified</span>
+    <span class="k">if</span> <span class="n">save_file</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">today</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="n">d_</span> <span class="o">=</span> <span class="n">today</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y&quot;</span><span class="p">)</span>
+        <span class="n">save_file</span> <span class="o">=</span> <span class="s2">&quot;CelltypeDeconvolver_</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">.pt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d_</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model will be saved in:&quot;</span><span class="p">,</span> <span class="n">save_file</span><span class="p">)</span>
+
+    <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1"># TRAIN STATISTICS</span>
+        <span class="s1">&#39;train_loss&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="c1"># VALIDATION STATS</span>
+        <span class="s1">&#39;validation_loss&#39;</span><span class="p">:</span> <span class="p">[]</span>
+    <span class="p">}</span>
+
+    <span class="c1"># extract torch attributes</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">)</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;optimizer&quot;</span><span class="p">)</span>
+    <span class="n">criterion</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;criterion&quot;</span><span class="p">)</span>
+
+    <span class="n">p_loss_value</span> <span class="o">=</span> <span class="n">best_loss</span> <span class="c1"># this will change on the first passthrough</span>
+    <span class="n">p_</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># patience counter</span>
+    <span class="n">e_</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># epoch counter</span>
+    <span class="k">while</span> <span class="n">p_</span> <span class="o">&lt;</span> <span class="n">patience</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># flags</span>
+        <span class="n">nans_found</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># TRAINING</span>
+        <span class="c1">#</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="n">train_epoch_loss</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">train_loss_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">X_</span><span class="p">,</span> <span class="n">Y_</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+            <span class="c1"># passthrough and backprop</span>
+            <span class="n">X_</span><span class="p">,</span> <span class="n">Y_</span> <span class="o">=</span> <span class="n">X_</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">Y_</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+            <span class="n">loss_</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="n">Y_</span><span class="p">)</span>
+            <span class="n">loss_</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+            <span class="c1"># SCALE TO 1 (unit vector)</span>
+            <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">)</span> <span class="c1"># first remove negatives</span>
+            <span class="n">sums_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># use the sum to scale</span>
+            <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="n">sums_</span><span class="p">)</span>
+            <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># END OF SCALING</span>
+
+            <span class="c1"># With large sparse outputs NaNs can occur, simply report this for now (as a result of sums_ == 0)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">Y_pred</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">nans_found</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># compute batch loss</span>
+            <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss_</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">loss_</span><span class="p">):</span>
+                <span class="c1"># use counter to revoke loss without values</span>
+                <span class="n">train_loss_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">train_epoch_loss</span> <span class="o">+=</span> <span class="n">loss_</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># VALIDATION</span>
+        <span class="c1">#</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="n">val_epoch_loss</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">val_loss_counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">X_</span><span class="p">,</span> <span class="n">Y_</span> <span class="ow">in</span> <span class="n">val_loader</span><span class="p">:</span>
+                <span class="c1"># passthrough</span>
+                <span class="n">X_</span><span class="p">,</span> <span class="n">Y_</span> <span class="o">=</span> <span class="n">X_</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">Y_</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+                <span class="n">loss_</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="n">Y_</span><span class="p">)</span>
+
+                <span class="c1"># SCALE TO 1 (unit vector)</span>
+                <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">)</span> <span class="c1"># first remove negatives</span>
+                <span class="n">sums_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># use the sum to scale</span>
+                <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="n">sums_</span><span class="p">)</span>
+                <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># END OF SCALING</span>
+
+                <span class="c1"># With large sparse outputs NaNs can occur, simply report this for now (as a result of sums_ == 0)</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">Y_pred</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">nans_found</span> <span class="o">=</span> <span class="mi">1</span>
+
+                <span class="c1"># compute batch loss</span>
+                <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss_</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">loss_</span><span class="p">):</span>
+                    <span class="n">val_loss_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">val_epoch_loss</span> <span class="o">+=</span> <span class="n">loss_</span>
+
+        <span class="c1"># STATS</span>
+        <span class="n">tel</span> <span class="o">=</span> <span class="n">train_epoch_loss</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span><span class="o">-</span><span class="n">train_loss_counter</span><span class="p">)</span> <span class="c1"># reduce by NaNs found</span>
+        <span class="n">vel</span> <span class="o">=</span> <span class="n">val_epoch_loss</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val_loader</span><span class="p">)</span><span class="o">-</span><span class="n">val_loss_counter</span><span class="p">)</span> <span class="c1"># reduce by NaNs found</span>
+
+        <span class="c1"># Check validation loss</span>
+        <span class="k">if</span> <span class="n">p_loss_value</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># set target loss value</span>
+            <span class="n">p_loss_value</span> <span class="o">=</span> <span class="n">vel</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if new loss is better than old then update</span>
+            <span class="k">if</span> <span class="n">vel</span> <span class="o">&lt;</span> <span class="n">p_loss_value</span><span class="p">:</span>
+                <span class="n">p_loss_value</span> <span class="o">=</span> <span class="n">vel</span>
+                <span class="n">p_</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># reset patience</span>
+
+                <span class="c1"># the model is better, save it as the current best for this timestep</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">save_file</span><span class="p">)</span>
+
+
+        <span class="c1"># ADD STATS</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;train_loss&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tel</span><span class="p">)</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;validation_loss&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vel</span><span class="p">)</span>
+
+        <span class="c1"># increase counters</span>
+        <span class="n">e_</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">p_</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># report current stats</span>
+        <span class="k">if</span> <span class="n">experiment</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch: </span><span class="si">{</span><span class="n">e_</span><span class="o">+</span><span class="mi">0</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1"> | Epochs since last increase: </span><span class="si">{</span><span class="p">(</span><span class="n">p_</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">0</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;| !!NaNs vectors produced!!&#39;</span> <span class="k">if</span> <span class="n">nans_found</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loss: (Train) </span><span class="si">{</span><span class="n">tel</span><span class="si">:</span><span class="s1">.5f</span><span class="si">}</span><span class="s1"> | (Valid): </span><span class="si">{</span><span class="n">vel</span><span class="si">:</span><span class="s1">.5f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished training (checkpoint saved in: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">save_file</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time elapsed: </span><span class="si">{</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="mi">60</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Minutes)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">auto_load_model_on_finish</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Autoloading best parameters onto model (auto_load_model_on_finish==True)&quot;</span><span class="p">)</span>
+        <span class="n">experiment</span><span class="o">.</span><span class="n">loadCheckpoint</span><span class="p">(</span><span class="n">save_file</span><span class="p">)</span> <span class="c1"># restore the best checkpoint</span>
+
+    <span class="k">return</span> <span class="n">stats</span></div>
+
+
+
+<div class="viewcode-block" id="predict"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.predict">[docs]</a><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">test_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Predict profiles using the current model found in the experiment, this will test dataset, if `test_loader` has not been set. You should load a loader yourself if you want to predict spots.</span>
+
+<span class="sd">    :param test_loader: A test_loader with profiles to deconvolute, defaults to None, in which case the test profiles will be used.</span>
+<span class="sd">    :type test_loader: Dataloader (None, optional)</span>
+
+<span class="sd">    :return: A list of deconvoluted cell types (profiles).</span>
+<span class="sd">    :rtype: List</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">profiles</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># retrieve experiment elements</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">model</span>
+    <span class="c1"># if test_loader is not set, use the one from the experiment</span>
+    <span class="k">if</span> <span class="n">test_loader</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">test_loader</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">test_loader</span>
+
+    <span class="n">device</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="ow">in</span> <span class="n">test_loader</span><span class="p">:</span>
+            <span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="o">=</span> <span class="n">X_batch</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">y_batch</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X_batch</span><span class="p">)</span>
+
+            <span class="c1">#</span>
+            <span class="c1"># SCALE TO 1</span>
+            <span class="c1">#</span>
+            <span class="c1"># debug added</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span> <span class="c1"># first remove negatives</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y_pred</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">experiment</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_pred is nan (before)&quot;</span><span class="p">)</span>
+
+            <span class="c1"># scale to 1</span>
+            <span class="n">sums_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">sums_</span><span class="p">)</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y_pred</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">experiment</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_pred is nan (after)&quot;</span><span class="p">)</span>
+
+            <span class="c1">#</span>
+            <span class="c1"># END OF SCALING</span>
+            <span class="c1">#</span>
+
+            <span class="k">for</span> <span class="n">prof</span> <span class="ow">in</span> <span class="n">y_pred</span><span class="p">:</span>
+                <span class="n">profiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prof</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+
+
+    <span class="k">return</span> <span class="n">profiles</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jesper Beltoft Lund.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

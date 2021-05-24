@@ -1,0 +1,534 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>antisplodge package &mdash; AntiSplodge 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to AntiSplodge’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> AntiSplodge
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">antisplodge package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-antisplodge.antisplodge">antisplodge.antisplodge module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-antisplodge">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AntiSplodge</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>antisplodge package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/antisplodge.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="antisplodge-package">
+<h1>antisplodge package<a class="headerlink" href="#antisplodge-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-antisplodge.antisplodge">
+<span id="antisplodge-antisplodge-module"></span><h2>antisplodge.antisplodge module<a class="headerlink" href="#module-antisplodge.antisplodge" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="antisplodge.antisplodge.CelltypeDeconvolver">
+<em class="property">class </em><code class="sig-prename descclassname">antisplodge.antisplodge.</code><code class="sig-name descname">CelltypeDeconvolver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_feature</span></em>, <em class="sig-param"><span class="n">num_class</span></em>, <em class="sig-param"><span class="n">number_of_layers_per_part</span></em>, <em class="sig-param"><span class="n">first_part_size</span></em>, <em class="sig-param"><span class="n">second_part_size</span></em>, <em class="sig-param"><span class="n">last_part_size</span></em>, <em class="sig-param"><span class="n">out_part_size</span></em>, <em class="sig-param"><span class="n">input_dropout</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#CelltypeDeconvolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.CelltypeDeconvolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>A class extending the <cite>nn.Module</cite> from pytorch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_feature</strong> (<em>int</em>) – Number of input elements/features (usually gene-based).</p></li>
+<li><p><strong>num_class</strong> (<em>int</em>) – Number of output elements, usually cell types or similr classes.</p></li>
+<li><p><strong>number_of_layers_per_part</strong> (<em>int</em>) – Number of hidden layers per layer block/part.</p></li>
+<li><p><strong>first_part_size</strong> (<em>int</em>) – Number of neurons per layer in the first block/part.</p></li>
+<li><p><strong>second_part_size</strong> (<em>int</em>) – Number of neurons per layer in the second block/part.</p></li>
+<li><p><strong>last_part_size</strong> (<em>int</em>) – Number of neurons per layer in the last block/part.</p></li>
+<li><p><strong>out_part_size</strong> (<em>int</em>) – Number of neurons in the last layer immediate before the final output layer.</p></li>
+<li><p><strong>input_dropout</strong> (<em>float</em>) – Dropout in the input layer, used to simulate spareness or missing genes during training.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="antisplodge.antisplodge.CelltypeDeconvolver.Get">
+<code class="sig-name descname">Get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#CelltypeDeconvolver.Get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.CelltypeDeconvolver.Get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to retrieve members in the class’s <cite>member</cite> dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – Key in the <cite>member</cite> dictionary.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the value of the member.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Anything</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.CelltypeDeconvolver.Set">
+<code class="sig-name descname">Set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#CelltypeDeconvolver.Set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.CelltypeDeconvolver.Set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to store members in the class’s <cite>member</cite> dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Key in the <cite>member</cite> dictionary.</p></li>
+<li><p><strong>val</strong> (<em>Anything</em>) – Value to be stored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.CelltypeDeconvolver.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#CelltypeDeconvolver.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.CelltypeDeconvolver.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="antisplodge.antisplodge.CelltypeDeconvolver.training">
+<code class="sig-name descname">training</code><a class="headerlink" href="#antisplodge.antisplodge.CelltypeDeconvolver.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment">
+<em class="property">class </em><code class="sig-prename descclassname">antisplodge.antisplodge.</code><code class="sig-name descname">DeconvolutionExperiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">SC</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A deconvolution experiment class used to keep track of everything that is required to do a full AntiSplodge experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>SC</strong> (<em>AnnData</em>) – A single-cell dataset, formatted as an AnnData object.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment.generateTrainTestValidation">
+<code class="sig-name descname">generateTrainTestValidation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_profiles</span></em>, <em class="sig-param"><span class="n">CD</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment.generateTrainTestValidation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment.generateTrainTestValidation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate training, testing, and, validation profiles.
+This function will call <cite>multinomialSampler</cite>, <cite>getConvolutedProfilesFromDistributions</cite>, and, <cite>getProportionFromCountVector</cite>, in that order, for each dataset.
+This create members: <cite>X_train_counts</cite>, <cite>X_val_counts</cite>, <cite>X_test_counts</cite>, <cite>X_train</cite>, <cite>X_val</cite>, <cite>X_test</cite>, <cite>Y_train</cite>, <cite>Y_val</cite>, <cite>Y_test</cite>, <cite>Y_train_prop</cite>, <cite>Y_val_prop</cite>, <cite>Y_test_prop</cite>, <cite>num_features</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_profiles</strong> (<em>list of ints</em><em>, </em><em>length = 3</em>) – A list of lengths 3, controlling the number of profiles used for training, testing, and, validation (index 0, 1, and, 2, respectively).</p></li>
+<li><p><strong>CD</strong> (<em>list of ints</em><em>, </em><em>length = 2</em>) – A list of lengths 2, controlling the number of cell densities used (index 0 is the minimum number of CDs, and index 1 is the maximum number of CDs). The same CD will be used for the training, testing, and, validation dataset, respectively.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment.loadCheckpoint">
+<code class="sig-name descname">loadCheckpoint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">checkpoint</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment.loadCheckpoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment.loadCheckpoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a checkpoint file (.pt) containing the state of a neural network onto the <cite>model</cite> member variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>checkpoint</strong> (<em>str</em>) – The path to the checkpoint file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment.setCellTypeColumn">
+<code class="sig-name descname">setCellTypeColumn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment.setCellTypeColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment.setCellTypeColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Column in the <cite>SC</cite> dataset, that holds the cell types. This create members: <cite>celltypes_column</cite>, <cite>celltypes</cite>, <cite>num_classes</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Name (key) of the column.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment.setVerbosity">
+<code class="sig-name descname">setVerbosity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment.setVerbosity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment.setVerbosity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the verbosity level of the prints of the experiment, either True or False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em>) – Verboisty of the prints (True or False), this is False when the experiment is inititalized.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment.setupDataLoaders">
+<code class="sig-name descname">setupDataLoaders</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">1000</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment.setupDataLoaders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment.setupDataLoaders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will process the profiles generated by the <cite>generateTrainTestValidation</cite> method into ready-to-use data loaders. This create members: <cite>train_loader</cite>, <cite>val_loader</cite>, <cite>test_loader</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_size</strong> (<em>int</em><em> (</em><em>1000</em><em>, </em><em>optional</em><em>)</em>) – The number of samples in each batch, defaults to 1000</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment.setupModel">
+<code class="sig-name descname">setupModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cuda_id</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">dropout</span><span class="o">=</span><span class="default_value">0.33</span></em>, <em class="sig-param"><span class="n">fps</span><span class="o">=</span><span class="default_value">512</span></em>, <em class="sig-param"><span class="n">sps</span><span class="o">=</span><span class="default_value">256</span></em>, <em class="sig-param"><span class="n">lps</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">ops</span><span class="o">=</span><span class="default_value">64</span></em>, <em class="sig-param"><span class="n">lp</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment.setupModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment.setupModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the feed forward neural network model. We recommend about half number of nodes per part for each subsequent layer part.
+The first layer should be smaller than the input. Check out the member variable <cite>num_features</cite>.
+This create members: <cite>model</cite>, <cite>device</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cuda_id</strong> (<em>int</em><em> (or </em><em>&quot;cpu&quot;</em><em>) </em><em>(</em><em>1</em><em>, </em><em>optional</em><em>)</em>) – The id of the CUDA device, this can be either an int for the id or “cpu” (to use CPU device), defaults to 1</p></li>
+<li><p><strong>dropout</strong> (<em>float</em><em> (</em><em>0.33</em><em>, </em><em>optional</em><em>)</em>) – [ParamDescription], defaults to 0.33</p></li>
+<li><p><strong>fps</strong> (<em>int</em><em> (</em><em>512</em><em>, </em><em>optional</em><em>)</em>) – Nodes for each layer for the first part/block, defaults to 512</p></li>
+<li><p><strong>sps</strong> (<em>int</em><em> (</em><em>256</em><em>, </em><em>optional</em><em>)</em>) – Nodes for each layer for the second part/block, defaults to 256</p></li>
+<li><p><strong>lps</strong> (<em>int</em><em> (</em><em>128</em><em>, </em><em>optional</em><em>)</em>) – Nodes for each layer for the last part/block, defaults to 128</p></li>
+<li><p><strong>ops</strong> (<em>int</em><em> (</em><em>64</em><em>, </em><em>optional</em><em>)</em>) – Number of nodes in the last hidden layer just before the output layer, defaults to 64</p></li>
+<li><p><strong>lp</strong> (<em>int</em><em> (</em><em>1</em><em>, </em><em>optional</em><em>)</em>) – Layers per part/block, defaults to 1</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment.setupOptimizerAndCriterion">
+<code class="sig-name descname">setupOptimizerAndCriterion</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">learning_rate</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">criterion</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment.setupOptimizerAndCriterion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment.setupOptimizerAndCriterion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the optimizer and criterion, and bind it to the model. This create members: <cite>optimizer</cite>, <cite>criterion</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>learning_rate</strong> (<em>float</em><em> (</em><em>0.001</em><em>, </em><em>optional</em><em>)</em>) – The learning rate of the optimizer, if you supply another optimizer, remember to set it yourself, defaults to 0.001</p></li>
+<li><p><strong>optimizer</strong> (<em>Pytorch optimizer</em><em> (</em><em>None</em><em>, </em><em>optional</em><em>)</em>) – The neural network optimizer, defaults to <cite>None</cite>, and will then use pytorch’s <cite>optim.Adam</cite>.</p></li>
+<li><p><strong>criterion</strong> (<em>Pytorch criterion</em><em> or </em><em>loss function</em><em> (</em><em>None</em><em>, </em><em>optional</em><em>)</em>) – The neural network criterion, defaults to <cite>None</cite>, and will then use pytorch’s <cite>nn.SmoothL1Loss</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="antisplodge.antisplodge.DeconvolutionExperiment.splitTrainTestValidation">
+<code class="sig-name descname">splitTrainTestValidation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train</span><span class="o">=</span><span class="default_value">0.9</span></em>, <em class="sig-param"><span class="n">rest</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#DeconvolutionExperiment.splitTrainTestValidation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.DeconvolutionExperiment.splitTrainTestValidation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split the <cite>SC</cite> dataset into training, validation and test dataset, the splits are strattified on the cell types.
+This create members: <cite>trainIndex</cite>, <cite>valIndex</cite>, <cite>testIndex</cite>, <cite>SC_train</cite>, <cite>SC_val</cite>, <cite>SC_test</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train</strong> (<em>float</em><em> (</em><em>0.9</em><em>, </em><em>optional</em><em>)</em>) – A number between 0 and 1 controlling the proportion of samples used in the training dataset, defaults to 0.9 (90%)</p></li>
+<li><p><strong>rest</strong> (<em>float</em><em> (</em><em>0.5</em><em>, </em><em>optional</em><em>)</em>) – A number between 0 and 1 controlling the proportion of samples used in the training dataset (the rest will be in the validation dataset), defaults to 0.5 (A 50%/50% split)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="antisplodge.antisplodge.SingleCellDataset">
+<em class="property">class </em><code class="sig-prename descclassname">antisplodge.antisplodge.</code><code class="sig-name descname">SingleCellDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwds</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#SingleCellDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.SingleCellDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.dataset.Dataset</span></code></p>
+<p>A simple class used to store X and y relations as a paired dataset.
+We use it to store gene-based profiles (X) that are related to class-based profiles (y).
+This function is used to store tensors intended to train, validate or test the models generated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_data</strong> (<em>Tensor</em>) – A tensor where each element is a list of gene counts or gene proportions.</p></li>
+<li><p><strong>Y_data</strong> (<em>Tensor</em>) – A tensor where each element is a list of cell type counts or cell type proportions</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="antisplodge.antisplodge.getConvolutedProfilesFromDistributions">
+<code class="sig-prename descclassname">antisplodge.antisplodge.</code><code class="sig-name descname">getConvolutedProfilesFromDistributions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">adata</span></em>, <em class="sig-param"><span class="n">cell_types</span></em>, <em class="sig-param"><span class="n">cell_type_key</span></em>, <em class="sig-param"><span class="n">distributions</span></em>, <em class="sig-param"><span class="n">normalize_X</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#getConvolutedProfilesFromDistributions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.getConvolutedProfilesFromDistributions" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function that converts the profiles generated with <cite>multinomialSampler</cite>, into gene-based profiles by sampling cells from the <cite>SC</cite> dataset, corresponding to the number of counts found in each profile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> (<em>AnnData</em>) – An AnnData object, this is usually the <cite>SC</cite> dataset, in the experiment class <cite>DeconvolutionExperiment</cite>.</p></li>
+<li><p><strong>cell_types</strong> (<em>List</em>) – A ordered list of cell types, found in <cite>adata`s `cell_type_key</cite>.</p></li>
+<li><p><strong>cell_type_key</strong> (<em>str</em>) – The key/column found in <cite>adata</cite>, the method will look for in the observations (<cite>obs</cite>) data frame.</p></li>
+<li><p><strong>distributions</strong> (<em>[</em><em>ParamType</em><em>]</em>) – The profiles that should be processed to be convoluted, usually generated using <cite>multinomialSampler</cite>.</p></li>
+<li><p><strong>normalize_X</strong> (<em>bool</em><em> (</em><em>False</em><em>, </em><em>optional</em><em>)</em>) – If <cite>True</cite>, each convoluted profile is scaled to sum to 1 (assuming cell types already are scaled to 1), defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict containing three lists. <cite>X_list</cite>, a gene-based list of convoluted profiles, each profile is a list of genes. <cite>Y_list</cite>, a list of cell types used to produce <cite>X_list</cite>, each element is class-based list. <cite>I_list</cite>, a list of indicies, to traceback what cells were used to generate the <cite>X_list</cite>. Each list is index-based related, so the first element of <cite>X_list</cite> is related to the first element of <cite>Y_list</cite> and the first element of <cite>I_list</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="antisplodge.antisplodge.getProportionFromCountVector">
+<code class="sig-prename descclassname">antisplodge.antisplodge.</code><code class="sig-name descname">getProportionFromCountVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Y_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#getProportionFromCountVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.getProportionFromCountVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function that will convert the count vectors into proportions. This is used to go from count vectors of cell types to proportions of cell types. Each profile will sum to 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>Y_list</strong> (<em>List</em>) – Converts count profiles to proportion profiles.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of proportion profiles.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="antisplodge.antisplodge.multinomialSampler">
+<code class="sig-prename descclassname">antisplodge.antisplodge.</code><code class="sig-name descname">multinomialSampler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Nc</span></em>, <em class="sig-param"><span class="n">M</span></em>, <em class="sig-param"><span class="n">CD_min</span></em>, <em class="sig-param"><span class="n">CD_max</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#multinomialSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.multinomialSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>A multinomial sampler with a temperatured step function, making sampling of classes/cell types go from equally likely to more extreme (singleton-like).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Nc</strong> (<em>int</em>) – The number of cell types. Usually in the range of 5-50.</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – The number of profiles generated, for each <cite>CD</cite>.  see <cite>CD_min</cite> and <cite>CD_max</cite> for more information.</p></li>
+<li><p><strong>CD_min</strong> (<em>int</em>) – CD is cell density, and it is the measure of how many cells contribute to a particular profile. <cite>CD_min</cite> is the miniumum number of cells contributing to a profile, and together with <cite>CD_max</cite> they form a range of CDs, going from <cite>CD_min</cite> to <cite>CD_max</cite>.</p></li>
+<li><p><strong>CD_max</strong> (<em>int</em>) – CD is cell density, and it is the measure of how many cells contribute to a particular profile. <cite>CD_max</cite> is the maximum number of cells contributing to a profile, and together with <cite>CD_min</cite> they form a range of CDs, going from <cite>CD_min</cite> to <cite>CD_max</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Return a list of profiles, with the number of profiles equal to <cite>Nc x M x (CD_max - CD_min + 1)</cite>. Each profile contains a count value (positive integer, including 0) for each class/cell type.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="antisplodge.antisplodge.predict">
+<code class="sig-prename descclassname">antisplodge.antisplodge.</code><code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span></em>, <em class="sig-param"><span class="n">test_loader</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict profiles using the current model found in the experiment, this will test dataset, if <cite>test_loader</cite> has not been set. You should load a loader yourself if you want to predict spots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>test_loader</strong> (<em>Dataloader</em><em> (</em><em>None</em><em>, </em><em>optional</em><em>)</em>) – A test_loader with profiles to deconvolute, defaults to None, in which case the test profiles will be used.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of deconvoluted cell types (profiles).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="antisplodge.antisplodge.train">
+<code class="sig-prename descclassname">antisplodge.antisplodge.</code><code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span></em>, <em class="sig-param"><span class="n">patience</span><span class="o">=</span><span class="default_value">25</span></em>, <em class="sig-param"><span class="n">save_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">auto_load_model_on_finish</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">best_loss</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge/antisplodge.html#train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.antisplodge.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the model found in an experiment, this will utilize the train and validation dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>patience</strong> (<em>int</em><em> (</em><em>25</em><em>, </em><em>optional</em><em>)</em>) – Patience counter, the training will stop once a new better loss hasn’t been seen in the last <cite>patience</cite> epochs, defaults to 25</p></li>
+<li><p><strong>save_file</strong> (<em>str</em><em> or </em><em>None</em><em> (</em><em>None</em><em>, </em><em>optional</em><em>)</em>) – The file to save the model parameters each time a better setting has been found. This is done each time the validation error is better (lower) than the best seen. Defaults to None, in which case a time-stamped file will be used.</p></li>
+<li><p><strong>auto_load_model_on_finish</strong> (<em>bool</em><em> (</em><em>True</em><em>, </em><em>optional</em><em>)</em>) – If the best model settings should be loaded back onto the model when the training stops, defaults to True</p></li>
+<li><p><strong>best_loss</strong> (<em>float</em><em> or </em><em>None</em><em> (</em><em>None</em><em>, </em><em>optional</em><em>)</em>) – A loss function to beat in order to save the model as the new best, used for warm restarts, defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary with keys: <cite>train_loss</cite> and <cite>validation_loss</cite>, containing the train and validation loss for each epoch.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-antisplodge">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-antisplodge" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to AntiSplodge’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jesper Beltoft Lund.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

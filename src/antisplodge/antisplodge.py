@@ -7,11 +7,20 @@ from sklearn.model_selection import train_test_split
 from datetime import date
 import time
 
-#
-# Nc: is the number of cell types
-# M: is the number of profiles for each CD we want to sample
-#
 def multinomialSampler(Nc, M, CD_min, CD_max):
+    """A multinomial sampler with a temperatured step function, making sampling of classes/cell types go from equally likely to more extreme (singleton-like).
+
+    :param Nc: The number of cell types. Usually in the range of 5-50.
+    :type Nc: int
+    :param M: The number of profiles generated, for each `CD`.  see `CD_min` and `CD_max` for more information.
+    :type M: int
+    :param CD_min: CD is cell density, and it is the measure of how many cells contribute to a particular profile. `CD_min` is the miniumum number of cells contributing to a profile, and together with `CD_max` they form a range of CDs, going from `CD_min` to `CD_max`.
+    :type CD_min: int
+    :param CD_max: CD is cell density, and it is the measure of how many cells contribute to a particular profile. `CD_max` is the maximum number of cells contributing to a profile, and together with `CD_min` they form a range of CDs, going from `CD_min` to `CD_max`.
+    :type CD_max: int
+    :return: Return a list of profiles, with the number of profiles equal to `Nc x M x (CD_max - CD_min + 1)`. Each profile contains a count value (positive integer, including 0) for each class/cell type.
+    :rtype: List
+    """
     profiles=[]
     # Sample across cell densites (S)
     for S in range(CD_min, CD_max+1):
@@ -29,11 +38,22 @@ def multinomialSampler(Nc, M, CD_min, CD_max):
             profiles.append(profile)
     return profiles
 
-#
-#
-#
-#
 def getConvolutedProfilesFromDistributions(adata, cell_types, cell_type_key, distributions, normalize_X=False):
+    """A function that converts the profiles generated with `multinomialSampler`, into gene-based profiles by sampling cells from the `SC` dataset, corresponding to the number of counts found in each profile.
+
+    :param adata: An AnnData object, this is usually the `SC` dataset, in the experiment class `DeconvolutionExperiment`.
+    :type adata: AnnData
+    :param cell_types: A ordered list of cell types, found in `adata`s `cell_type_key`.
+    :type cell_types: List
+    :param cell_type_key: The key/column found in `adata`, the method will look for in the observations (`obs`) data frame.
+    :type cell_type_key: str
+    :param distributions: The profiles that should be processed to be convoluted, usually generated using `multinomialSampler`.
+    :type distributions: [ParamType]
+    :param normalize_X: If `True`, each convoluted profile is scaled to sum to 1 (assuming cell types already are scaled to 1), defaults to False.
+    :type normalize_X: bool (False, optional)
+    :return: A dict containing three lists. `X_list`, a gene-based list of convoluted profiles, each profile is a list of genes. `Y_list`, a list of cell types used to produce `X_list`, each element is class-based list. `I_list`, a list of indicies, to traceback what cells were used to generate the `X_list`. Each list is index-based related, so the first element of `X_list` is related to the first element of `Y_list` and the first element of `I_list`.
+    :rtype: Dict
+    """
     # make a copy of the adata
     adata_copy = adata.copy()
     # pre subset cell_types save expensive operations
@@ -85,6 +105,13 @@ def getConvolutedProfilesFromDistributions(adata, cell_types, cell_type_key, dis
 
 
 def getProportionFromCountVector(Y_list):
+    """A function that will convert the count vectors into proportions. This is used to go from count vectors of cell types to proportions of cell types. Each profile will sum to 1.
+
+    :param Y_list: Converts count profiles to proportion profiles.
+    :type Y_list: List
+    :return: A list of proportion profiles.
+    :rtype: List
+    """
     ret_list = [] # return list
     for i in range(len(Y_list)):
         # this is a single profile
@@ -98,7 +125,15 @@ def getProportionFromCountVector(Y_list):
 
 
 class SingleCellDataset(Dataset):
+    """A simple class used to store X and y relations as a paired dataset.
+    We use it to store gene-based profiles (X) that are related to class-based profiles (y).
+    This function is used to store tensors intended to train, validate or test the models generated.
 
+    :param X_data: A tensor where each element is a list of gene counts or gene proportions.
+    :type X_data: Tensor
+    :param Y_data: A tensor where each element is a list of cell type counts or cell type proportions
+    :type Y_data: Tensor
+    """
     def __init__(self, X_data, y_data):
         self.X_data = X_data
         self.y_data = y_data
@@ -110,6 +145,25 @@ class SingleCellDataset(Dataset):
         return len(self.X_data)
 
 class CelltypeDeconvolver(nn.Module):
+    """A class extending the `nn.Module` from pytorch.
+
+    :param num_feature: Number of input elements/features (usually gene-based).
+    :type num_feature: int
+    :param num_class: Number of output elements, usually cell types or similr classes.
+    :type num_class: int
+    :param number_of_layers_per_part: Number of hidden layers per layer block/part.
+    :type number_of_layers_per_part: int
+    :param first_part_size: Number of neurons per layer in the first block/part.
+    :type first_part_size: int
+    :param second_part_size: Number of neurons per layer in the second block/part.
+    :type second_part_size: int
+    :param last_part_size: Number of neurons per layer in the last block/part.
+    :type last_part_size: int
+    :param out_part_size: Number of neurons in the last layer immediate before the final output layer.
+    :type out_part_size: int
+    :param input_dropout: Dropout in the input layer, used to simulate spareness or missing genes during training.
+    :type input_dropout: float
+    """
     def __init__(self, num_feature, num_class, number_of_layers_per_part, first_part_size, second_part_size, last_part_size, out_part_size, input_dropout):
         super(CelltypeDeconvolver, self).__init__()
 
@@ -159,12 +213,31 @@ class CelltypeDeconvolver(nn.Module):
         return x
 
     def Set(self, key, val):
+        """Used to store members in the class's `member` dictionary.
+
+        :param key: Key in the `member` dictionary.
+        :type key: str
+        :param val: Value to be stored.
+        :type val: Anything
+        """
         self.members[key] = val
 
     def Get(self, key):
+        """Used to retrieve members in the class's `member` dictionary.
+
+        :param key: Key in the `member` dictionary.
+        :type key: str
+        :return: Returns the value of the member.
+        :rtype: Anything
+        """
         return self.members[key]
 
 class DeconvolutionExperiment:
+    """A deconvolution experiment class used to keep track of everything that is required to do a full AntiSplodge experiment.
+
+    :param SC: A single-cell dataset, formatted as an AnnData object.
+    :type SC: AnnData
+    """
     def __init__(self, SC):
         # h5ad/AnnData formated single-cell dataset
         self.SC = SC
@@ -176,14 +249,32 @@ class DeconvolutionExperiment:
         self.verbose = False
 
     def setVerbosity(self, verbose):
+        """Sets the verbosity level of the prints of the experiment, either True or False.
+
+        :param verbose: Verboisty of the prints (True or False), this is False when the experiment is inititalized.
+        :type verbose: bool
+        """
         self.verbose = verbose
 
     def setCellTypeColumn(self, name):
+        """Column in the `SC` dataset, that holds the cell types. This create members: `celltypes_column`, `celltypes`, `num_classes`.
+
+        :param name: Name (key) of the column.
+        :type name: str
+        """
         self.celltypes_column = name
         self.celltypes = np.array(np.unique(self.SC.obs[name]))
         self.num_classes = len(self.celltypes)
 
     def splitTrainTestValidation(self, train=0.9, rest=0.5):
+        """Split the `SC` dataset into training, validation and test dataset, the splits are strattified on the cell types.
+        This create members: `trainIndex`, `valIndex`, `testIndex`, `SC_train`, `SC_val`, `SC_test`.
+
+        :param train: A number between 0 and 1 controlling the proportion of samples used in the training dataset, defaults to 0.9 (90%)
+        :type train: float (0.9, optional)
+        :param rest: A number between 0 and 1 controlling the proportion of samples used in the training dataset (the rest will be in the validation dataset), defaults to 0.5 (A 50%/50% split)
+        :type rest: float (0.5, optional)
+        """
         #
         # Split into train and rest
         #
@@ -210,6 +301,15 @@ class DeconvolutionExperiment:
         self.SC_test = SC_rest[TestIndex,:]
 
     def generateTrainTestValidation(self, num_profiles, CD):
+        """Generate training, testing, and, validation profiles.
+        This function will call `multinomialSampler`, `getConvolutedProfilesFromDistributions`, and, `getProportionFromCountVector`, in that order, for each dataset.
+        This create members: `X_train_counts`, `X_val_counts`, `X_test_counts`, `X_train`, `X_val`, `X_test`, `Y_train`, `Y_val`, `Y_test`, `Y_train_prop`, `Y_val_prop`, `Y_test_prop`, `num_features`.
+
+        :param num_profiles: A list of lengths 3, controlling the number of profiles used for training, testing, and, validation (index 0, 1, and, 2, respectively).
+        :type num_profiles: list of ints, length = 3
+        :param CD: A list of lengths 2, controlling the number of cell densities used (index 0 is the minimum number of CDs, and index 1 is the maximum number of CDs). The same CD will be used for the training, testing, and, validation dataset, respectively.
+        :type CD: list of ints, length = 2
+        """
         # SAMPLE PROFILES
         if self.verbose:
             print("GENERATING PROFILES")
@@ -252,6 +352,11 @@ class DeconvolutionExperiment:
 
 
     def setupDataLoaders(self, batch_size=1000):
+        """Will process the profiles generated by the `generateTrainTestValidation` method into ready-to-use data loaders. This create members: `train_loader`, `val_loader`, `test_loader`.
+
+        :param batch_size: The number of samples in each batch, defaults to 1000
+        :type batch_size: int (1000, optional)
+        """
         # batch size for data loaders
         self.batch_size = batch_size
 
@@ -282,6 +387,25 @@ class DeconvolutionExperiment:
         self.test_loader = test_loader
 
     def setupModel(self, cuda_id=1, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1):
+        """Initialize the feed forward neural network model. We recommend about half number of nodes per part for each subsequent layer part.
+        The first layer should be smaller than the input. Check out the member variable `num_features`.
+        This create members: `model`, `device`.
+
+        :param cuda_id: The id of the CUDA device, this can be either an int for the id or "cpu" (to use CPU device), defaults to 1
+        :type cuda_id: int (or "cpu") (1, optional)
+        :param dropout: [ParamDescription], defaults to 0.33
+        :type dropout: float (0.33, optional)
+        :param fps: Nodes for each layer for the first part/block, defaults to 512
+        :type fps: int (512, optional)
+        :param sps: Nodes for each layer for the second part/block, defaults to 256
+        :type sps: int (256, optional)
+        :param lps: Nodes for each layer for the last part/block, defaults to 128
+        :type lps: int (128, optional)
+        :param ops: Number of nodes in the last hidden layer just before the output layer, defaults to 64
+        :type ops: int (64, optional)
+        :param lp: Layers per part/block, defaults to 1
+        :type lp: int (1, optional)
+        """
         # CUDA SETTINGS
         device = torch.device("cuda:{}".format(cuda_id) if torch.cuda.is_available() else "cpu")
         if self.verbose:
@@ -307,6 +431,15 @@ class DeconvolutionExperiment:
         self.model = model
 
     def setupOptimizerAndCriterion(self, learning_rate = 0.001, optimizer=None, criterion=None):
+        """Set the optimizer and criterion, and bind it to the model. This create members: `optimizer`, `criterion`.
+
+        :param learning_rate: The learning rate of the optimizer, if you supply another optimizer, remember to set it yourself, defaults to 0.001
+        :type learning_rate: float (0.001, optional)
+        :param optimizer: The neural network optimizer, defaults to `None`, and will then use pytorch's `optim.Adam`.
+        :type optimizer: Pytorch optimizer (None, optional)
+        :param criterion: The neural network criterion, defaults to `None`, and will then use pytorch's `nn.SmoothL1Loss`.
+        :type criterion: Pytorch criterion or loss function (None, optional)
+        """
         # define optimizer and criterion if not set
         if optimizer == None:
             optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
@@ -324,12 +457,28 @@ class DeconvolutionExperiment:
 
 
     def loadCheckpoint(self, checkpoint):
+        """Loads a checkpoint file (.pt) containing the state of a neural network onto the `model` member variable.
+
+        :param checkpoint: The path to the checkpoint file
+        :type checkpoint: str
+        """
         print("Restoring checkpoint:", checkpoint)
         self.model.load_state_dict(torch.load(checkpoint))
 
-
-# patience is the number of epochs before stopping
 def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=True, best_loss=None):
+    """Train the model found in an experiment, this will utilize the train and validation dataset.
+
+    :param patience: Patience counter, the training will stop once a new better loss hasn't been seen in the last `patience` epochs, defaults to 25
+    :type patience: int (25, optional)
+    :param save_file: The file to save the model parameters each time a better setting has been found. This is done each time the validation error is better (lower) than the best seen. Defaults to None, in which case a time-stamped file will be used.
+    :type save_file: str or None (None, optional)
+    :param auto_load_model_on_finish: If the best model settings should be loaded back onto the model when the training stops, defaults to True
+    :type auto_load_model_on_finish: bool (True, optional)
+    :param best_loss: A loss function to beat in order to save the model as the new best, used for warm restarts, defaults to None.
+    :type best_loss: float or None (None, optional)
+    :return: A dictionary with keys: `train_loss` and `validation_loss`, containing the train and validation loss for each epoch.
+    :rtype: Dict
+    """
     # time the function
     t0 = time.time()
 
@@ -474,6 +623,14 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
 
 
 def predict(experiment, test_loader=None):
+    """Predict profiles using the current model found in the experiment, this will test dataset, if `test_loader` has not been set. You should load a loader yourself if you want to predict spots.
+
+    :param test_loader: A test_loader with profiles to deconvolute, defaults to None, in which case the test profiles will be used.
+    :type test_loader: Dataloader (None, optional)
+
+    :return: A list of deconvoluted cell types (profiles).
+    :rtype: List
+    """
     profiles = []
 
     # retrieve experiment elements
