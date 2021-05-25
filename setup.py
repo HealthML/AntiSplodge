@@ -1,6 +1,6 @@
 import setuptools
 
-exec(open("./src/antisplodge/_version.py").read()) # this will provide __version__
+exec(open("./antisplodge/_version.py").read()) # this will provide __version__
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -22,7 +22,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "src"},
+    package_dir={"": "antisplodge"},
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
     install_requires=[
