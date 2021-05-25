@@ -1,5 +1,5 @@
-src
-===
+antisplodge
+===========
 
 .. toctree::
    :maxdepth: 4

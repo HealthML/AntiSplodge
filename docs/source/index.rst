@@ -6,7 +6,7 @@
 Welcome to AntiSplodge's documentation!
 =======================================
 
-The main functions are stored in the submodule antisplodge.
+The main functions are stored in the antisplodge file.
 
 .. toctree::
    :maxdepth: 4

@@ -7,12 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>antisplodge.antisplodge &mdash; AntiSplodge 0.1.0 documentation</title>
+  <title>antisplodge &mdash; AntiSplodge 0.1.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
 
   
   
@@ -24,21 +24,21 @@
 
   
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
+    <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -52,7 +52,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> AntiSplodge
+            <a href="../index.html" class="icon icon-home"> AntiSplodge
           
 
           
@@ -65,7 +65,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -85,7 +85,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../antisplodge.html">antisplodge package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../antisplodge.html">antisplodge package</a></li>
 </ul>
 
             
@@ -101,7 +101,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">AntiSplodge</a>
+          <a href="../index.html">AntiSplodge</a>
         
       </nav>
 
@@ -132,11 +132,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../index.html">Module code</a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
         
-      <li>antisplodge.antisplodge</li>
+      <li>antisplodge</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -151,7 +151,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for antisplodge.antisplodge</h1><div class="highlight"><pre>
+  <h1>Source code for antisplodge</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -161,7 +161,7 @@
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<div class="viewcode-block" id="multinomialSampler"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.multinomialSampler">[docs]</a><span class="k">def</span> <span class="nf">multinomialSampler</span><span class="p">(</span><span class="n">Nc</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">CD_min</span><span class="p">,</span> <span class="n">CD_max</span><span class="p">):</span>
+<div class="viewcode-block" id="multinomialSampler"><a class="viewcode-back" href="../antisplodge.html#antisplodge.multinomialSampler">[docs]</a><span class="k">def</span> <span class="nf">multinomialSampler</span><span class="p">(</span><span class="n">Nc</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">CD_min</span><span class="p">,</span> <span class="n">CD_max</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A multinomial sampler with a temperatured step function, making sampling of classes/cell types go from equally likely to more extreme (singleton-like).</span>
 
 <span class="sd">    :param Nc: The number of cell types. Usually in the range of 5-50.</span>
@@ -192,7 +192,7 @@
             <span class="n">profiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">profiles</span></div>
 
-<div class="viewcode-block" id="getConvolutedProfilesFromDistributions"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.getConvolutedProfilesFromDistributions">[docs]</a><span class="k">def</span> <span class="nf">getConvolutedProfilesFromDistributions</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">cell_types</span><span class="p">,</span> <span class="n">cell_type_key</span><span class="p">,</span> <span class="n">distributions</span><span class="p">,</span> <span class="n">normalize_X</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="getConvolutedProfilesFromDistributions"><a class="viewcode-back" href="../antisplodge.html#antisplodge.getConvolutedProfilesFromDistributions">[docs]</a><span class="k">def</span> <span class="nf">getConvolutedProfilesFromDistributions</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">cell_types</span><span class="p">,</span> <span class="n">cell_type_key</span><span class="p">,</span> <span class="n">distributions</span><span class="p">,</span> <span class="n">normalize_X</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A function that converts the profiles generated with `multinomialSampler`, into gene-based profiles by sampling cells from the `SC` dataset, corresponding to the number of counts found in each profile.</span>
 
 <span class="sd">    :param adata: An AnnData object, this is usually the `SC` dataset, in the experiment class `DeconvolutionExperiment`.</span>
@@ -258,7 +258,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">X_list</span><span class="p">,</span> <span class="n">Y_list</span><span class="p">,</span> <span class="n">I_list</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="getProportionFromCountVector"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.getProportionFromCountVector">[docs]</a><span class="k">def</span> <span class="nf">getProportionFromCountVector</span><span class="p">(</span><span class="n">Y_list</span><span class="p">):</span>
+<div class="viewcode-block" id="getProportionFromCountVector"><a class="viewcode-back" href="../antisplodge.html#antisplodge.getProportionFromCountVector">[docs]</a><span class="k">def</span> <span class="nf">getProportionFromCountVector</span><span class="p">(</span><span class="n">Y_list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A function that will convert the count vectors into proportions. This is used to go from count vectors of cell types to proportions of cell types. Each profile will sum to 1.</span>
 
 <span class="sd">    :param Y_list: Converts count profiles to proportion profiles.</span>
@@ -278,7 +278,7 @@
     <span class="k">return</span> <span class="n">ret_list</span></div>
 
 
-<div class="viewcode-block" id="SingleCellDataset"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.SingleCellDataset">[docs]</a><span class="k">class</span> <span class="nc">SingleCellDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<div class="viewcode-block" id="SingleCellDataset"><a class="viewcode-back" href="../antisplodge.html#antisplodge.SingleCellDataset">[docs]</a><span class="k">class</span> <span class="nc">SingleCellDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A simple class used to store X and y relations as a paired dataset.</span>
 <span class="sd">    We use it to store gene-based profiles (X) that are related to class-based profiles (y).</span>
 <span class="sd">    This function is used to store tensors intended to train, validate or test the models generated.</span>
@@ -298,7 +298,7 @@
     <span class="k">def</span> <span class="fm">__len__</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_data</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CelltypeDeconvolver"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.CelltypeDeconvolver">[docs]</a><span class="k">class</span> <span class="nc">CelltypeDeconvolver</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="CelltypeDeconvolver"><a class="viewcode-back" href="../antisplodge.html#antisplodge.CelltypeDeconvolver">[docs]</a><span class="k">class</span> <span class="nc">CelltypeDeconvolver</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A class extending the `nn.Module` from pytorch.</span>
 
 <span class="sd">    :param num_feature: Number of input elements/features (usually gene-based).</span>
@@ -360,13 +360,13 @@
         <span class="c1"># leaky relu used to penalize values below 0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">negative_slope</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
 
-<div class="viewcode-block" id="CelltypeDeconvolver.forward"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.CelltypeDeconvolver.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<div class="viewcode-block" id="CelltypeDeconvolver.forward"><a class="viewcode-back" href="../antisplodge.html#antisplodge.CelltypeDeconvolver.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="c1"># iterate through all defined layers</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span></div>
 
-<div class="viewcode-block" id="CelltypeDeconvolver.Set"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.CelltypeDeconvolver.Set">[docs]</a>    <span class="k">def</span> <span class="nf">Set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<div class="viewcode-block" id="CelltypeDeconvolver.Set"><a class="viewcode-back" href="../antisplodge.html#antisplodge.CelltypeDeconvolver.Set">[docs]</a>    <span class="k">def</span> <span class="nf">Set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Used to store members in the class&#39;s `member` dictionary.</span>
 
 <span class="sd">        :param key: Key in the `member` dictionary.</span>
@@ -376,7 +376,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
 
-<div class="viewcode-block" id="CelltypeDeconvolver.Get"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.CelltypeDeconvolver.Get">[docs]</a>    <span class="k">def</span> <span class="nf">Get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="CelltypeDeconvolver.Get"><a class="viewcode-back" href="../antisplodge.html#antisplodge.CelltypeDeconvolver.Get">[docs]</a>    <span class="k">def</span> <span class="nf">Get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Used to retrieve members in the class&#39;s `member` dictionary.</span>
 
 <span class="sd">        :param key: Key in the `member` dictionary.</span>
@@ -386,7 +386,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div></div>
 
-<div class="viewcode-block" id="DeconvolutionExperiment"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment">[docs]</a><span class="k">class</span> <span class="nc">DeconvolutionExperiment</span><span class="p">:</span>
+<div class="viewcode-block" id="DeconvolutionExperiment"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment">[docs]</a><span class="k">class</span> <span class="nc">DeconvolutionExperiment</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A deconvolution experiment class used to keep track of everything that is required to do a full AntiSplodge experiment.</span>
 
 <span class="sd">    :param SC: A single-cell dataset, formatted as an AnnData object.</span>
@@ -402,7 +402,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="DeconvolutionExperiment.setVerbosity"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setVerbosity">[docs]</a>    <span class="k">def</span> <span class="nf">setVerbosity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.setVerbosity"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.setVerbosity">[docs]</a>    <span class="k">def</span> <span class="nf">setVerbosity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the verbosity level of the prints of the experiment, either True or False.</span>
 
 <span class="sd">        :param verbose: Verboisty of the prints (True or False), this is False when the experiment is inititalized.</span>
@@ -410,7 +410,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span></div>
 
-<div class="viewcode-block" id="DeconvolutionExperiment.setCellTypeColumn"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setCellTypeColumn">[docs]</a>    <span class="k">def</span> <span class="nf">setCellTypeColumn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.setCellTypeColumn"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.setCellTypeColumn">[docs]</a>    <span class="k">def</span> <span class="nf">setCellTypeColumn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Column in the `SC` dataset, that holds the cell types. This create members: `celltypes_column`, `celltypes`, `num_classes`.</span>
 
 <span class="sd">        :param name: Name (key) of the column.</span>
@@ -420,7 +420,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">celltypes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SC</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">name</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">celltypes</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DeconvolutionExperiment.splitTrainTestValidation"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.splitTrainTestValidation">[docs]</a>    <span class="k">def</span> <span class="nf">splitTrainTestValidation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">rest</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.splitTrainTestValidation"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.splitTrainTestValidation">[docs]</a>    <span class="k">def</span> <span class="nf">splitTrainTestValidation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">rest</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Split the `SC` dataset into training, validation and test dataset, the splits are strattified on the cell types.</span>
 <span class="sd">        This create members: `trainIndex`, `valIndex`, `testIndex`, `SC_train`, `SC_val`, `SC_test`.</span>
 
@@ -454,7 +454,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">SC_val</span> <span class="o">=</span> <span class="n">SC_rest</span><span class="p">[</span><span class="n">ValIndex</span><span class="p">,:]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SC_test</span> <span class="o">=</span> <span class="n">SC_rest</span><span class="p">[</span><span class="n">TestIndex</span><span class="p">,:]</span></div>
 
-<div class="viewcode-block" id="DeconvolutionExperiment.generateTrainTestValidation"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.generateTrainTestValidation">[docs]</a>    <span class="k">def</span> <span class="nf">generateTrainTestValidation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_profiles</span><span class="p">,</span> <span class="n">CD</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.generateTrainTestValidation"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.generateTrainTestValidation">[docs]</a>    <span class="k">def</span> <span class="nf">generateTrainTestValidation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_profiles</span><span class="p">,</span> <span class="n">CD</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate training, testing, and, validation profiles.</span>
 <span class="sd">        This function will call `multinomialSampler`, `getConvolutedProfilesFromDistributions`, and, `getProportionFromCountVector`, in that order, for each dataset.</span>
 <span class="sd">        This create members: `X_train_counts`, `X_val_counts`, `X_test_counts`, `X_train`, `X_val`, `X_test`, `Y_train`, `Y_val`, `Y_test`, `Y_train_prop`, `Y_val_prop`, `Y_test_prop`, `num_features`.</span>
@@ -505,7 +505,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">num_features</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="DeconvolutionExperiment.setupDataLoaders"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setupDataLoaders">[docs]</a>    <span class="k">def</span> <span class="nf">setupDataLoaders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.setupDataLoaders"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.setupDataLoaders">[docs]</a>    <span class="k">def</span> <span class="nf">setupDataLoaders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Will process the profiles generated by the `generateTrainTestValidation` method into ready-to-use data loaders. This create members: `train_loader`, `val_loader`, `test_loader`.</span>
 
 <span class="sd">        :param batch_size: The number of samples in each batch, defaults to 1000</span>
@@ -540,7 +540,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> <span class="o">=</span> <span class="n">val_loader</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span> <span class="o">=</span> <span class="n">test_loader</span></div>
 
-<div class="viewcode-block" id="DeconvolutionExperiment.setupModel"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setupModel">[docs]</a>    <span class="k">def</span> <span class="nf">setupModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cuda_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">sps</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">lps</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">lp</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.setupModel"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.setupModel">[docs]</a>    <span class="k">def</span> <span class="nf">setupModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cuda_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">sps</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">lps</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">lp</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize the feed forward neural network model. We recommend about half number of nodes per part for each subsequent layer part.</span>
 <span class="sd">        The first layer should be smaller than the input. Check out the member variable `num_features`.</span>
 <span class="sd">        This create members: `model`, `device`.</span>
@@ -584,7 +584,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span></div>
 
-<div class="viewcode-block" id="DeconvolutionExperiment.setupOptimizerAndCriterion"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.setupOptimizerAndCriterion">[docs]</a>    <span class="k">def</span> <span class="nf">setupOptimizerAndCriterion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.setupOptimizerAndCriterion"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.setupOptimizerAndCriterion">[docs]</a>    <span class="k">def</span> <span class="nf">setupOptimizerAndCriterion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set the optimizer and criterion, and bind it to the model. This create members: `optimizer`, `criterion`.</span>
 
 <span class="sd">        :param learning_rate: The learning rate of the optimizer, if you supply another optimizer, remember to set it yourself, defaults to 0.001</span>
@@ -610,7 +610,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span></div>
 
 
-<div class="viewcode-block" id="DeconvolutionExperiment.loadCheckpoint"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.DeconvolutionExperiment.loadCheckpoint">[docs]</a>    <span class="k">def</span> <span class="nf">loadCheckpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.loadCheckpoint"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.loadCheckpoint">[docs]</a>    <span class="k">def</span> <span class="nf">loadCheckpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Loads a checkpoint file (.pt) containing the state of a neural network onto the `model` member variable.</span>
 
 <span class="sd">        :param checkpoint: The path to the checkpoint file</span>
@@ -619,7 +619,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Restoring checkpoint:&quot;</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">))</span></div></div>
 
-<div class="viewcode-block" id="train"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.train">[docs]</a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auto_load_model_on_finish</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">best_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="train"><a class="viewcode-back" href="../antisplodge.html#antisplodge.train">[docs]</a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auto_load_model_on_finish</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">best_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Train the model found in an experiment, this will utilize the train and validation dataset.</span>
 
 <span class="sd">    :param patience: Patience counter, the training will stop once a new better loss hasn&#39;t been seen in the last `patience` epochs, defaults to 25</span>
@@ -776,7 +776,7 @@
 
 
 
-<div class="viewcode-block" id="predict"><a class="viewcode-back" href="../../antisplodge.html#antisplodge.antisplodge.predict">[docs]</a><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">test_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="predict"><a class="viewcode-back" href="../antisplodge.html#antisplodge.predict">[docs]</a><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">test_loader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Predict profiles using the current model found in the experiment, this will test dataset, if `test_loader` has not been set. You should load a loader yourself if you want to predict spots.</span>
 
 <span class="sd">    :param test_loader: A test_loader with profiles to deconvolute, defaults to None, in which case the test profiles will be used.</span>

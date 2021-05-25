@@ -1,19 +1,7 @@
 antisplodge package
 ===================
 
-Submodules
-----------
-
-antisplodge.antisplodge module
-------------------------------
-
-.. automodule:: antisplodge.antisplodge
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Module contents
+AntiSplodge functions
 ---------------
 
 .. automodule:: antisplodge
