@@ -37,7 +37,7 @@ The full pipeline (see blow) assumes that you have a scRNA dataset (SC) and spat
 ### Standard full pipeline
 
 ```python
-import AntiSplodge as AS
+import antisplodge as AS
 # SC should be the single-cell dataset formatted as .h5ad (AnnData)
 Exp = AS.DeconvolutionExperiment(SC) 
 Exp.setVerbosity(True)
