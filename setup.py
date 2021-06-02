@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="AntiSplodge", # Replace with your own username
+    name="antisplodge", # Replace with your own username
     version=__version__,
     author="Jesper Beltoft Lund",
     author_email="Jesper.Lund@hpi.de",
