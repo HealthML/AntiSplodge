@@ -10,7 +10,7 @@ You can install the package directy by running the following pip command:
 
 `pip install antisplodge`
 
-You can find the pip page at: https://pypi.org/project/AntiSplodge/0.1.0/
+You can find the pip page at: https://pypi.org/project/AntiSplodge/
 
 ### From GitHuB
 
