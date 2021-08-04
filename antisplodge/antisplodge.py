@@ -163,8 +163,10 @@ class CelltypeDeconvolver(nn.Module):
     :type out_part_size: int
     :param input_dropout: Dropout in the input layer, used to simulate spareness or missing genes during training.
     :type input_dropout: float
+    :param normalize_output: Normalize output by scaling each tensor to 1, directly from the model and before computing the error. This sometimes speeds up the training for datasets with low number of classes.
+    :type normalize_output: bool
     """
-    def __init__(self, num_feature, num_class, number_of_layers_per_part, first_part_size, second_part_size, last_part_size, out_part_size, input_dropout):
+    def __init__(self, num_feature, num_class, number_of_layers_per_part, first_part_size, second_part_size, last_part_size, out_part_size, input_dropout, normalize_output=False):
         super(CelltypeDeconvolver, self).__init__()
 
         # helpers
@@ -203,13 +205,31 @@ class CelltypeDeconvolver(nn.Module):
 
         # go from last part to num classes
         self.layers.append(nn.Linear(out_part_size, num_class))
+
         # leaky relu used to penalize values below 0
         self.layers.append(nn.LeakyReLU(negative_slope=0.1))
+
+        # used in forward
+        self.normalize_output = normalize_output
+        self.num_class = num_class
 
     def forward(self, x):
         # iterate through all defined layers
         for layer in self.layers:
             x = layer(x)
+
+        if normalize_output:
+            x = nn.functional.relu(x)
+            sums_ = torch.sum(x, 1) # check for invalid
+            # set all invalid tensors to baseline
+            x[sums_ <= 0] = torch.tensor([1/self.num_class]*self.num_class)
+
+            sums_ = torch.sum(x, 1) # used for scaling
+            # scale to 1
+            x = torch.transpose(x, 0, 1)
+            x = torch.div(x, sums_)
+            x = torch.transpose(x, 0, 1)
+
         return x
 
     def Set(self, key, val):
