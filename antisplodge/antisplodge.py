@@ -406,7 +406,7 @@ class DeconvolutionExperiment:
         self.val_loader = val_loader
         self.test_loader = test_loader
 
-    def setupModel(self, cuda_id=1, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1):
+    def setupModel(self, cuda_id=1, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1, normalize_output=False):
         """Initialize the feed forward neural network model. We recommend about half number of nodes per part for each subsequent layer part.
         The first layer should be smaller than the input. Check out the member variable `num_features`.
         This create members: `model`, `device`.
@@ -440,7 +440,8 @@ class DeconvolutionExperiment:
             second_part_size = sps,
             last_part_size = lps,
             out_part_size = ops,
-            input_dropout = dropout
+            input_dropout = dropout,
+            normalize_output = normalize_output
         )
         # bind to device
         model.Set("device", device)
