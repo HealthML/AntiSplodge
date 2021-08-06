@@ -218,11 +218,11 @@ class CelltypeDeconvolver(nn.Module):
         for layer in self.layers:
             x = layer(x)
 
-        if normalize_output:
+        if self.normalize_output:
             x = nn.functional.relu(x)
             sums_ = torch.sum(x, 1) # check for invalid
             # set all invalid tensors to baseline
-            x[sums_ <= 0] = torch.tensor([1/self.num_class]*self.num_class)
+            x[sums_ <= 0] = torch.tensor([1/self.num_class]*self.num_class).to(self.Get("device"))
 
             sums_ = torch.sum(x, 1) # used for scaling
             # scale to 1
