@@ -498,6 +498,8 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
     :type auto_load_model_on_finish: bool (True, optional)
     :param best_loss: A loss function to beat in order to save the model as the new best, used for warm restarts, defaults to None.
     :type best_loss: float or None (None, optional)
+    :param validation_metric: Whether the validation check should be meassured in "jsd" (JSD), or based on loss (!="jsd").
+    :type validation_metric: String ("jsd", optional)
     :return: A dictionary with keys: `train_loss` and `validation_loss`, containing the train and validation loss for each epoch.
     :rtype: Dict
     """
@@ -608,7 +610,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
         vel = val_epoch_loss/(len(val_loader)-val_loss_counter) # reduce by NaNs found
 
 
-        if validation_metric=="jsd"
+        if validation_metric=="jsd":
             val_metric = getMeanJSD(self, split_dataset="validation")
         else: # use loss if not using JSD validation
             val_metric = vel
