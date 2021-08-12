@@ -158,6 +158,7 @@
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">WeightedRandomSampler</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">distance</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
@@ -317,8 +318,10 @@
 <span class="sd">    :type out_part_size: int</span>
 <span class="sd">    :param input_dropout: Dropout in the input layer, used to simulate spareness or missing genes during training.</span>
 <span class="sd">    :type input_dropout: float</span>
+<span class="sd">    :param normalize_output: Normalize output by scaling each tensor to 1, directly from the model and before computing the error. This sometimes speeds up the training for datasets with low number of classes.</span>
+<span class="sd">    :type normalize_output: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_feature</span><span class="p">,</span> <span class="n">num_class</span><span class="p">,</span> <span class="n">number_of_layers_per_part</span><span class="p">,</span> <span class="n">first_part_size</span><span class="p">,</span> <span class="n">second_part_size</span><span class="p">,</span> <span class="n">last_part_size</span><span class="p">,</span> <span class="n">out_part_size</span><span class="p">,</span> <span class="n">input_dropout</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_feature</span><span class="p">,</span> <span class="n">num_class</span><span class="p">,</span> <span class="n">number_of_layers_per_part</span><span class="p">,</span> <span class="n">first_part_size</span><span class="p">,</span> <span class="n">second_part_size</span><span class="p">,</span> <span class="n">last_part_size</span><span class="p">,</span> <span class="n">out_part_size</span><span class="p">,</span> <span class="n">input_dropout</span><span class="p">,</span> <span class="n">normalize_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CelltypeDeconvolver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># helpers</span>
@@ -357,13 +360,31 @@
 
         <span class="c1"># go from last part to num classes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">out_part_size</span><span class="p">,</span> <span class="n">num_class</span><span class="p">))</span>
+
         <span class="c1"># leaky relu used to penalize values below 0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">negative_slope</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
+
+        <span class="c1"># used in forward</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize_output</span> <span class="o">=</span> <span class="n">normalize_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_class</span> <span class="o">=</span> <span class="n">num_class</span>
 
 <div class="viewcode-block" id="CelltypeDeconvolver.forward"><a class="viewcode-back" href="../antisplodge.html#antisplodge.CelltypeDeconvolver.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="c1"># iterate through all defined layers</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_output</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">sums_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># check for invalid</span>
+            <span class="c1"># set all invalid tensors to baseline</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">sums_</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">num_class</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">num_class</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">))</span>
+
+            <span class="n">sums_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># used for scaling</span>
+            <span class="c1"># scale to 1</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sums_</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">x</span></div>
 
 <div class="viewcode-block" id="CelltypeDeconvolver.Set"><a class="viewcode-back" href="../antisplodge.html#antisplodge.CelltypeDeconvolver.Set">[docs]</a>    <span class="k">def</span> <span class="nf">Set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
@@ -540,7 +561,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">val_loader</span> <span class="o">=</span> <span class="n">val_loader</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_loader</span> <span class="o">=</span> <span class="n">test_loader</span></div>
 
-<div class="viewcode-block" id="DeconvolutionExperiment.setupModel"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.setupModel">[docs]</a>    <span class="k">def</span> <span class="nf">setupModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cuda_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">sps</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">lps</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">lp</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="DeconvolutionExperiment.setupModel"><a class="viewcode-back" href="../antisplodge.html#antisplodge.DeconvolutionExperiment.setupModel">[docs]</a>    <span class="k">def</span> <span class="nf">setupModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cuda_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">sps</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">lps</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">ops</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">lp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">normalize_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize the feed forward neural network model. We recommend about half number of nodes per part for each subsequent layer part.</span>
 <span class="sd">        The first layer should be smaller than the input. Check out the member variable `num_features`.</span>
 <span class="sd">        This create members: `model`, `device`.</span>
@@ -574,7 +595,8 @@
             <span class="n">second_part_size</span> <span class="o">=</span> <span class="n">sps</span><span class="p">,</span>
             <span class="n">last_part_size</span> <span class="o">=</span> <span class="n">lps</span><span class="p">,</span>
             <span class="n">out_part_size</span> <span class="o">=</span> <span class="n">ops</span><span class="p">,</span>
-            <span class="n">input_dropout</span> <span class="o">=</span> <span class="n">dropout</span>
+            <span class="n">input_dropout</span> <span class="o">=</span> <span class="n">dropout</span><span class="p">,</span>
+            <span class="n">normalize_output</span> <span class="o">=</span> <span class="n">normalize_output</span>
         <span class="p">)</span>
         <span class="c1"># bind to device</span>
         <span class="n">model</span><span class="o">.</span><span class="n">Set</span><span class="p">(</span><span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
@@ -619,7 +641,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Restoring checkpoint:&quot;</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">))</span></div></div>
 
-<div class="viewcode-block" id="train"><a class="viewcode-back" href="../antisplodge.html#antisplodge.train">[docs]</a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auto_load_model_on_finish</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">best_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="train"><a class="viewcode-back" href="../antisplodge.html#antisplodge.train">[docs]</a><span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">save_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auto_load_model_on_finish</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">best_loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validation_metric</span><span class="o">=</span><span class="s2">&quot;jsd&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Train the model found in an experiment, this will utilize the train and validation dataset.</span>
 
 <span class="sd">    :param patience: Patience counter, the training will stop once a new better loss hasn&#39;t been seen in the last `patience` epochs, defaults to 25</span>
@@ -630,6 +652,8 @@
 <span class="sd">    :type auto_load_model_on_finish: bool (True, optional)</span>
 <span class="sd">    :param best_loss: A loss function to beat in order to save the model as the new best, used for warm restarts, defaults to None.</span>
 <span class="sd">    :type best_loss: float or None (None, optional)</span>
+<span class="sd">    :param validation_metric: Whether the validation check should be meassured in &quot;jsd&quot; (JSD), or based on loss (!=&quot;jsd&quot;).</span>
+<span class="sd">    :type validation_metric: String (&quot;jsd&quot;, optional)</span>
 <span class="sd">    :return: A dictionary with keys: `train_loss` and `validation_loss`, containing the train and validation loss for each epoch.</span>
 <span class="sd">    :rtype: Dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -739,14 +763,22 @@
         <span class="n">tel</span> <span class="o">=</span> <span class="n">train_epoch_loss</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span><span class="o">-</span><span class="n">train_loss_counter</span><span class="p">)</span> <span class="c1"># reduce by NaNs found</span>
         <span class="n">vel</span> <span class="o">=</span> <span class="n">val_epoch_loss</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val_loader</span><span class="p">)</span><span class="o">-</span><span class="n">val_loss_counter</span><span class="p">)</span> <span class="c1"># reduce by NaNs found</span>
 
+
+        <span class="k">if</span> <span class="n">validation_metric</span><span class="o">==</span><span class="s2">&quot;jsd&quot;</span><span class="p">:</span>
+            <span class="n">val_metric</span> <span class="o">=</span> <span class="n">getMeanJSD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split_dataset</span><span class="o">=</span><span class="s2">&quot;validation&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># use loss if not using JSD validation</span>
+            <span class="n">val_metric</span> <span class="o">=</span> <span class="n">vel</span>
+
+        <span class="n">found_better_weights</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># Check validation loss</span>
         <span class="k">if</span> <span class="n">p_loss_value</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># set target loss value</span>
-            <span class="n">p_loss_value</span> <span class="o">=</span> <span class="n">vel</span>
+            <span class="n">p_loss_value</span> <span class="o">=</span> <span class="n">val_metric</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># if new loss is better than old then update</span>
-            <span class="k">if</span> <span class="n">vel</span> <span class="o">&lt;</span> <span class="n">p_loss_value</span><span class="p">:</span>
-                <span class="n">p_loss_value</span> <span class="o">=</span> <span class="n">vel</span>
+            <span class="k">if</span> <span class="n">val_metric</span> <span class="o">&lt;=</span> <span class="n">p_loss_value</span><span class="p">:</span>
+                <span class="n">p_loss_value</span> <span class="o">=</span> <span class="n">val_metric</span>
                 <span class="n">p_</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># reset patience</span>
+                <span class="n">found_better_weights</span> <span class="o">=</span> <span class="kc">True</span>
 
                 <span class="c1"># the model is better, save it as the current best for this timestep</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">save_file</span><span class="p">)</span>
@@ -762,7 +794,7 @@
 
         <span class="c1"># report current stats</span>
         <span class="k">if</span> <span class="n">experiment</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch: </span><span class="si">{</span><span class="n">e_</span><span class="o">+</span><span class="mi">0</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1"> | Epochs since last increase: </span><span class="si">{</span><span class="p">(</span><span class="n">p_</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">0</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;| !!NaNs vectors produced!!&#39;</span> <span class="k">if</span> <span class="n">nans_found</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch: </span><span class="si">{</span><span class="n">e_</span><span class="o">+</span><span class="mi">0</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1"> | Epochs since last increase: </span><span class="si">{</span><span class="p">(</span><span class="n">p_</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">0</span><span class="si">:</span><span class="s1">03</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;| !!NaNs vectors produced!!&#39;</span> <span class="k">if</span> <span class="n">nans_found</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;| Better solution found&#39;</span> <span class="k">if</span> <span class="n">found_better_weights</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loss: (Train) </span><span class="si">{</span><span class="n">tel</span><span class="si">:</span><span class="s1">.5f</span><span class="si">}</span><span class="s1"> | (Valid): </span><span class="si">{</span><span class="n">vel</span><span class="si">:</span><span class="s1">.5f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
@@ -829,6 +861,39 @@
 
 
     <span class="k">return</span> <span class="n">profiles</span></div>
+
+<div class="viewcode-block" id="getMeanJSD"><a class="viewcode-back" href="../antisplodge.html#antisplodge.getMeanJSD">[docs]</a><span class="k">def</span> <span class="nf">getMeanJSD</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">split_dataset</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the mean Jensen-Shannon Divergence for one of the split datasets.</span>
+
+<span class="sd">    :param split_dataset: A string indicating which split dataset to use.</span>
+<span class="sd">    :type split_dataset: String either &quot;train&quot;, &quot;validation&quot;, or, &quot;test&quot; (default, &quot;test&quot;)</span>
+
+<span class="sd">    :return: A float containing the mean JSD.</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">split_dataset</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
+        <span class="n">loader</span>      <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">train_loader</span>
+        <span class="n">proportions</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">Y_train_prop</span>
+
+    <span class="k">if</span> <span class="n">split_dataset</span> <span class="o">==</span> <span class="s2">&quot;validation&quot;</span><span class="p">:</span>
+        <span class="n">loader</span>      <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">val_loader</span>
+        <span class="n">proportions</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">Y_val_prop</span>
+
+    <span class="k">if</span> <span class="n">split_dataset</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span>
+        <span class="n">loader</span>      <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">test_loader</span>
+        <span class="n">proportions</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">Y_test_prop</span>
+
+    <span class="n">y_preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+
+    <span class="n">jsds_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_preds</span><span class="p">)):</span>
+        <span class="n">jsds_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">distance</span><span class="o">.</span><span class="n">jensenshannon</span><span class="p">(</span><span class="n">proportions</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y_preds</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="n">nan_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">jsds_</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">nan_counts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Caution: </span><span class="si">{}</span><span class="s2"> NaNs found.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nan_counts</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">jsds_</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

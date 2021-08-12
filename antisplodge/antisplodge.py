@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from sklearn.model_selection import train_test_split
+from scipy.spatial import distance
 from datetime import date
 import time
 
@@ -486,7 +487,7 @@ class DeconvolutionExperiment:
         print("Restoring checkpoint:", checkpoint)
         self.model.load_state_dict(torch.load(checkpoint))
 
-def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=True, best_loss=None):
+def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=True, best_loss=None, validation_metric="jsd"):
     """Train the model found in an experiment, this will utilize the train and validation dataset.
 
     :param patience: Patience counter, the training will stop once a new better loss hasn't been seen in the last `patience` epochs, defaults to 25
@@ -606,14 +607,22 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
         tel = train_epoch_loss/(len(train_loader)-train_loss_counter) # reduce by NaNs found
         vel = val_epoch_loss/(len(val_loader)-val_loss_counter) # reduce by NaNs found
 
+
+        if validation_metric=="jsd"
+            val_metric = getMeanJSD(self, split_dataset="validation")
+        else: # use loss if not using JSD validation
+            val_metric = vel
+
+        found_better_weights = False
         # Check validation loss
         if p_loss_value == None: # set target loss value
-            p_loss_value = vel
+            p_loss_value = val_metric
         else:
             # if new loss is better than old then update
-            if vel < p_loss_value:
-                p_loss_value = vel
+            if val_metric <= p_loss_value:
+                p_loss_value = val_metric
                 p_ = 0 # reset patience
+                found_better_weights = True
 
                 # the model is better, save it as the current best for this timestep
                 torch.save(model.state_dict(), save_file)
@@ -629,7 +638,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
 
         # report current stats
         if experiment.verbose:
-            print(f'Epoch: {e_+0:03} | Epochs since last increase: {(p_-1)+0:03}' + ('| !!NaNs vectors produced!!' if nans_found else ''))
+            print(f'Epoch: {e_+0:03} | Epochs since last increase: {(p_-1)+0:03}' + ('| !!NaNs vectors produced!!' if nans_found else '') + ('| Better solution found' if found_better_weights else ''))
             print(f'Loss: (Train) {tel:.5f} | (Valid): {vel:.5f}')
             print("")
 
@@ -696,3 +705,36 @@ def predict(experiment, test_loader=None):
 
 
     return profiles
+
+def getMeanJSD(experiment, split_dataset="test"):
+    """Get the mean Jensen-Shannon Divergence for one of the split datasets.
+
+    :param split_dataset: A string indicating which split dataset to use.
+    :type split_dataset: String either "train", "validation", or, "test" (default, "test")
+
+    :return: A float containing the mean JSD.
+    :rtype: float
+    """
+    if split_dataset == "train":
+        loader      = experiment.train_loader
+        proportions = experiment.Y_train_prop
+
+    if split_dataset == "validation":
+        loader      = experiment.val_loader
+        proportions = experiment.Y_val_prop
+
+    if split_dataset == "test":
+        loader      = experiment.test_loader
+        proportions = experiment.Y_test_prop
+
+    y_preds = predict(experiment, loader)
+
+    jsds_ = []
+    for i in range(len(y_preds)):
+        jsds_.append(distance.jensenshannon(proportions[i], y_preds[i]))
+
+    nan_counts = np.count_nonzero(~np.isnan(jsds_))
+    if nan_counts > 0:
+        print("Caution: {} NaNs found.".format(nan_counts))
+
+    return np.nanmean(jsds_)

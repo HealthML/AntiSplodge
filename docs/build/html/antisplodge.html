@@ -163,7 +163,7 @@
 <span id="antisplodge-functions"></span><h2>AntiSplodge functions<a class="headerlink" href="#module-antisplodge" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="antisplodge.CelltypeDeconvolver">
-<em class="property">class </em><code class="sig-prename descclassname">antisplodge.</code><code class="sig-name descname">CelltypeDeconvolver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_feature</span></em>, <em class="sig-param"><span class="n">num_class</span></em>, <em class="sig-param"><span class="n">number_of_layers_per_part</span></em>, <em class="sig-param"><span class="n">first_part_size</span></em>, <em class="sig-param"><span class="n">second_part_size</span></em>, <em class="sig-param"><span class="n">last_part_size</span></em>, <em class="sig-param"><span class="n">out_part_size</span></em>, <em class="sig-param"><span class="n">input_dropout</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge.html#CelltypeDeconvolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.CelltypeDeconvolver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">antisplodge.</code><code class="sig-name descname">CelltypeDeconvolver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_feature</span></em>, <em class="sig-param"><span class="n">num_class</span></em>, <em class="sig-param"><span class="n">number_of_layers_per_part</span></em>, <em class="sig-param"><span class="n">first_part_size</span></em>, <em class="sig-param"><span class="n">second_part_size</span></em>, <em class="sig-param"><span class="n">last_part_size</span></em>, <em class="sig-param"><span class="n">out_part_size</span></em>, <em class="sig-param"><span class="n">input_dropout</span></em>, <em class="sig-param"><span class="n">normalize_output</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge.html#CelltypeDeconvolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.CelltypeDeconvolver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <p>A class extending the <cite>nn.Module</cite> from pytorch.</p>
 <dl class="field-list simple">
@@ -177,6 +177,7 @@
 <li><p><strong>last_part_size</strong> (<em>int</em>) – Number of neurons per layer in the last block/part.</p></li>
 <li><p><strong>out_part_size</strong> (<em>int</em>) – Number of neurons in the last layer immediate before the final output layer.</p></li>
 <li><p><strong>input_dropout</strong> (<em>float</em>) – Dropout in the input layer, used to simulate spareness or missing genes during training.</p></li>
+<li><p><strong>normalize_output</strong> (<em>bool</em>) – Normalize output by scaling each tensor to 1, directly from the model and before computing the error. This sometimes speeds up the training for datasets with low number of classes.</p></li>
 </ul>
 </dd>
 </dl>
@@ -304,7 +305,7 @@ This create members: <cite>X_train_counts</cite>, <cite>X_val_counts</cite>, <ci
 
 <dl class="py method">
 <dt id="antisplodge.DeconvolutionExperiment.setupModel">
-<code class="sig-name descname">setupModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cuda_id</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">dropout</span><span class="o">=</span><span class="default_value">0.33</span></em>, <em class="sig-param"><span class="n">fps</span><span class="o">=</span><span class="default_value">512</span></em>, <em class="sig-param"><span class="n">sps</span><span class="o">=</span><span class="default_value">256</span></em>, <em class="sig-param"><span class="n">lps</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">ops</span><span class="o">=</span><span class="default_value">64</span></em>, <em class="sig-param"><span class="n">lp</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge.html#DeconvolutionExperiment.setupModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.DeconvolutionExperiment.setupModel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setupModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cuda_id</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">dropout</span><span class="o">=</span><span class="default_value">0.33</span></em>, <em class="sig-param"><span class="n">fps</span><span class="o">=</span><span class="default_value">512</span></em>, <em class="sig-param"><span class="n">sps</span><span class="o">=</span><span class="default_value">256</span></em>, <em class="sig-param"><span class="n">lps</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">ops</span><span class="o">=</span><span class="default_value">64</span></em>, <em class="sig-param"><span class="n">lp</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">normalize_output</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge.html#DeconvolutionExperiment.setupModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.DeconvolutionExperiment.setupModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the feed forward neural network model. We recommend about half number of nodes per part for each subsequent layer part.
 The first layer should be smaller than the input. Check out the member variable <cite>num_features</cite>.
 This create members: <cite>model</cite>, <cite>device</cite>.</p>
@@ -396,6 +397,23 @@ This function is used to store tensors intended to train, validate or test the m
 </dd></dl>
 
 <dl class="py function">
+<dt id="antisplodge.getMeanJSD">
+<code class="sig-prename descclassname">antisplodge.</code><code class="sig-name descname">getMeanJSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span></em>, <em class="sig-param"><span class="n">split_dataset</span><span class="o">=</span><span class="default_value">'test'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge.html#getMeanJSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.getMeanJSD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the mean Jensen-Shannon Divergence for one of the split datasets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>split_dataset</strong> (<em>String either &quot;train&quot;</em><em>, </em><em>&quot;validation&quot;</em><em>, </em><em>or</em><em>, </em><em>&quot;test&quot;</em><em> (</em><em>default</em><em>, </em><em>&quot;test&quot;</em><em>)</em>) – A string indicating which split dataset to use.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A float containing the mean JSD.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="antisplodge.getProportionFromCountVector">
 <code class="sig-prename descclassname">antisplodge.</code><code class="sig-name descname">getProportionFromCountVector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Y_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge.html#getProportionFromCountVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.getProportionFromCountVector" title="Permalink to this definition">¶</a></dt>
 <dd><p>A function that will convert the count vectors into proportions. This is used to go from count vectors of cell types to proportions of cell types. Each profile will sum to 1.</p>
@@ -453,7 +471,7 @@ This function is used to store tensors intended to train, validate or test the m
 
 <dl class="py function">
 <dt id="antisplodge.train">
-<code class="sig-prename descclassname">antisplodge.</code><code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span></em>, <em class="sig-param"><span class="n">patience</span><span class="o">=</span><span class="default_value">25</span></em>, <em class="sig-param"><span class="n">save_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">auto_load_model_on_finish</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">best_loss</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge.html#train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.train" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">antisplodge.</code><code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiment</span></em>, <em class="sig-param"><span class="n">patience</span><span class="o">=</span><span class="default_value">25</span></em>, <em class="sig-param"><span class="n">save_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">auto_load_model_on_finish</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">best_loss</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">validation_metric</span><span class="o">=</span><span class="default_value">'jsd'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/antisplodge.html#train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#antisplodge.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Train the model found in an experiment, this will utilize the train and validation dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -462,6 +480,7 @@ This function is used to store tensors intended to train, validate or test the m
 <li><p><strong>save_file</strong> (<em>str</em><em> or </em><em>None</em><em> (</em><em>None</em><em>, </em><em>optional</em><em>)</em>) – The file to save the model parameters each time a better setting has been found. This is done each time the validation error is better (lower) than the best seen. Defaults to None, in which case a time-stamped file will be used.</p></li>
 <li><p><strong>auto_load_model_on_finish</strong> (<em>bool</em><em> (</em><em>True</em><em>, </em><em>optional</em><em>)</em>) – If the best model settings should be loaded back onto the model when the training stops, defaults to True</p></li>
 <li><p><strong>best_loss</strong> (<em>float</em><em> or </em><em>None</em><em> (</em><em>None</em><em>, </em><em>optional</em><em>)</em>) – A loss function to beat in order to save the model as the new best, used for warm restarts, defaults to None.</p></li>
+<li><p><strong>validation_metric</strong> (<em>String</em><em> (</em><em>&quot;jsd&quot;</em><em>, </em><em>optional</em><em>)</em>) – Whether the validation check should be meassured in “jsd” (JSD), or based on loss (!=”jsd”).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
