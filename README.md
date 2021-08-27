@@ -2,7 +2,7 @@
 
 ![Overview](AS_overview.png)
 
-**AntiSplodge**, is a simple feed-forward neural network-based pipeline, designed to effective deconvolute spatial transcriptomics profiles, in an easy, fast, and, intuitive manner. It comes with all functions required to do a full deconvolution, from sampling synthetic spot profiles required to train the neural network, to the methods required to train the supplied network architecture. It is neatly packed into functions calls similar to that of traditional R-packages, where users are only exposed to fiddling with hyperparameters.
+**AntiSplodge**, is a simple feed-forward neural network-based pipeline, designed to effective deconvolute spatial transcriptomics profiles, in an easy, fast, and, intuitive manner. It comes with all functions required to do a full deconvolution, from sampling synthetic spot profiles required to train the neural network, to the methods required to train the supplied network architecture. It is neatly packed into a python package with function calls similar to that of traditional R-packages, where users are only exposed to fiddling with hyperparameters.
 
 ## Installation
 
