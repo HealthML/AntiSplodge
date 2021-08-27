@@ -67,22 +67,12 @@ Exp.setupOptimizerAndCriterion(learning_rate = 0.001)
 # The weights found will be saved to 'NNDeconvolver.pt' and will be autoloaded once the training is complete 
 stats = AS.train(Exp, save_file="NNDeconvolver.pt", patience=100)
 
-# Check the testing accuracy
-y_preds = AS.predict(Exp)
+# print the mean JSD for train, validation, and test
+print(AS.getMeanJSD(Exp, "train"), AS.getMeanJSD(Exp, "validation"), AS.getMeanJSD(Exp, "test"))
 
-# Print test divergance as (Jensen Shannon divergance)
-import numpy as np
-from scipy.spatial import distance
-jsds_ = []
-for i in range(len(y_preds)):
-    jsds_.append(distance.jensenshannon(Exp.Y_test_prop[i], y_preds[i]))
-print("Mean {}".format(np.mean(jsds_)))
-
-# Plot a boxplot of divergences for each test profile 
-import seaborn as sns
-import pandas as pd
-pd.DataFrame({'jsds': jsds_}).to_csv("MouseBrainTestJSDS.csv")
-sns.boxplot(y="JSD", data=pd.DataFrame({'JSD':jsds_}))
+#
+# Afterwards do prediction
+#
 
 # Assuming we have a spatial transcriptomics dataset ST formatted in .h5ad (AnnData)
 # create dataloader so that we can predict the profiles of each spot in our ST dataset
