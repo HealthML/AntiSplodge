@@ -8,6 +8,9 @@ from scipy.spatial import distance
 from datetime import date
 import time
 
+#  expose version from _version file
+from ._version import __version__
+
 def multinomialSampler(Nc, M, CD_min, CD_max):
     """A multinomial sampler with a temperatured step function, making sampling of classes/cell types go from equally likely to more extreme (singleton-like).
 
@@ -386,13 +389,24 @@ class DeconvolutionExperiment:
             dataset=dataset_train,
             batch_size=batch_size,
             shuffle=True
+
+        train_loader_no_shuffle = DataLoader(
+            dataset=dataset_train,
+            batch_size=batch_size,
+            shuffle=False
         )
+
 
         dataset_val = SingleCellDataset(torch.from_numpy(np.array(self.X_val)).float(), torch.from_numpy(np.array(self.Y_val_prop)).float())
         val_loader = DataLoader(
             dataset=dataset_val,
             batch_size=batch_size,
             shuffle=True
+        )
+        val_loader_no_shuffle = DataLoader(
+            dataset=dataset_val,
+            batch_size=batch_size,
+            shuffle=False
         )
 
         dataset_test = SingleCellDataset(torch.from_numpy(np.array(self.X_test)).float(), torch.from_numpy(np.array(self.Y_test_prop)).float())
@@ -404,7 +418,9 @@ class DeconvolutionExperiment:
 
         # bind loaders
         self.train_loader = train_loader
+        self.train_loader_no_shuffle = train_loader_no_shuffle
         self.val_loader = val_loader
+        self.val_loader_no_shuffle = val_loader_no_shuffle
         self.test_loader = test_loader
 
     def setupModel(self, cuda_id=1, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1, normalize_output=False):
@@ -611,7 +627,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
 
 
         if validation_metric=="jsd":
-            val_metric = getMeanJSD(self, split_dataset="validation")
+            val_metric = getMeanJSD(experiment, split_dataset="validation")
         else: # use loss if not using JSD validation
             val_metric = vel
 
@@ -621,7 +637,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
             p_loss_value = val_metric
         else:
             # if new loss is better than old then update
-            if val_metric <= p_loss_value:
+            if val_metric < p_loss_value:
                 p_loss_value = val_metric
                 p_ = 0 # reset patience
                 found_better_weights = True
@@ -640,7 +656,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
 
         # report current stats
         if experiment.verbose:
-            print(f'Epoch: {e_+0:03} | Epochs since last increase: {(p_-1)+0:03}' + ('| !!NaNs vectors produced!!' if nans_found else '') + ('| Better solution found' if found_better_weights else ''))
+            print(f'Epoch: {e_+0:03} | Epochs since last increase: {(p_-1)+0:03}' + (' | Better solution found' if found_better_weights else ''))
             print(f'Loss: (Train) {tel:.5f} | (Valid): {vel:.5f}')
             print("")
 
@@ -717,12 +733,14 @@ def getMeanJSD(experiment, split_dataset="test"):
     :return: A float containing the mean JSD.
     :rtype: float
     """
+    loader = None
+    proportions = None
     if split_dataset == "train":
-        loader      = experiment.train_loader
+        loader      = experiment.train_loader_no_shuffle
         proportions = experiment.Y_train_prop
 
     if split_dataset == "validation":
-        loader      = experiment.val_loader
+        loader      = experiment.val_loader_no_shuffle
         proportions = experiment.Y_val_prop
 
     if split_dataset == "test":
@@ -735,7 +753,7 @@ def getMeanJSD(experiment, split_dataset="test"):
     for i in range(len(y_preds)):
         jsds_.append(distance.jensenshannon(proportions[i], y_preds[i]))
 
-    nan_counts = np.count_nonzero(~np.isnan(jsds_))
+    nan_counts = np.count_nonzero(np.isnan(jsds_))
     if nan_counts > 0:
         print("Caution: {} NaNs found.".format(nan_counts))
 
