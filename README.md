@@ -50,9 +50,10 @@ Exp.setCellTypeColumn('CELLTYPE_COLUMN')
 Exp.splitTrainTestValidation(train=0.8, rest=0.5)
 
 # Generate profiles, num_profiles = [#training, #validation, #testing]
-# This will construct 10,000*10(CDs)=100,000, 5,000*10=50,000, 1,000*10=10,000 profiles  
+# This will construct 100.000 training profiles, 10.000 validation profiles, and, 10.000 test profiles
+# All profiles will be generated from 10 cell profiles (CD=10)
 # for train, validation and test (respectively)
-Exp.generateTrainTestValidation(num_profiles=[10000,5000,1000], CD=[1,10])
+Exp.generateTrainTestValidation(num_profiles=[100000,10000,10000], CD=[10,10])
 
 # Load the profiles into data loaders
 Exp.setupDataLoaders()
