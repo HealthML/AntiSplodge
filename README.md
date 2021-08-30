@@ -1,6 +1,8 @@
 # AntiSplodge ![MIT License](https://img.shields.io/badge/license-MIT%20License-blue.svg) ![CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-blue.svg)
 
-**AntiSplodge**, is a simple feed-forward neural network-based pipeline, designed to effective deconvolute spatial transcriptomics profiles, in an easy, fast, and, intuitive manner. It comes with all functions required to do a full deconvolution, from sampling synthetic spot profiles required to train the neural network, to the methods required to train the supplied network architecture. It is neatly packed into functions calls similar to that of traditional R-packages, where users are only exposed to fiddling with hyperparameters.
+![Overview](AS_overview.png)
+
+**AntiSplodge**, is a simple feed-forward neural network-based pipeline, designed to effective deconvolute spatial transcriptomics profiles, in an easy, fast, and, intuitive manner. It comes with all functions required to do a full deconvolution, from sampling synthetic spot profiles required to train the neural network, to the methods required to train the supplied network architecture. It is neatly packed into a python package with function calls similar to that of traditional R-packages, where users are only exposed to fiddling with hyperparameters.
 
 ## Installation
 
@@ -65,22 +67,12 @@ Exp.setupOptimizerAndCriterion(learning_rate = 0.001)
 # The weights found will be saved to 'NNDeconvolver.pt' and will be autoloaded once the training is complete 
 stats = AS.train(Exp, save_file="NNDeconvolver.pt", patience=100)
 
-# Check the testing accuracy
-y_preds = AS.predict(Exp)
+# print the mean JSD for train, validation, and test
+print(AS.getMeanJSD(Exp, "train"), AS.getMeanJSD(Exp, "validation"), AS.getMeanJSD(Exp, "test"))
 
-# Print test divergance as (Jensen Shannon divergance)
-import numpy as np
-from scipy.spatial import distance
-jsds_ = []
-for i in range(len(y_preds)):
-    jsds_.append(distance.jensenshannon(Exp.Y_test_prop[i], y_preds[i]))
-print("Mean {}".format(np.mean(jsds_)))
-
-# Plot a boxplot of divergences for each test profile 
-import seaborn as sns
-import pandas as pd
-pd.DataFrame({'jsds': jsds_}).to_csv("MouseBrainTestJSDS.csv")
-sns.boxplot(y="JSD", data=pd.DataFrame({'JSD':jsds_}))
+#
+# Afterwards do prediction
+#
 
 # Assuming we have a spatial transcriptomics dataset ST formatted in .h5ad (AnnData)
 # create dataloader so that we can predict the profiles of each spot in our ST dataset
