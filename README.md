@@ -174,12 +174,13 @@ Check out the tutorial located at: https://github.com/HealthML/AntiSplodge_Turor
 
 ## Dependencies
 
-The list of major dependencies are:
+The list of dependencies are:
 
 - numpy>=1.17.2 (https://numpy.org/)
 - pandas>=0.25.3 (https://pandas.pydata.org/)
 - scikit-learn>=0.22.1 (https://scikit-learn.org/)
 - torch>=1.9.0 (https://pytorch.org/)
+- scipy>=1.4.1 (https://www.scipy.org/)
 
 
 ## Documentation
@@ -196,4 +197,4 @@ The source code for AntiSplodge is licensed under the MIT License. See the [LICE
 
 ## Known issues 
 
-- AntiSplodge is prone to be affected by bad initiations. Oftentimes, this can be resolved by simply restarting the Experiment (or re-initializing the model). This seems to be more frequent when solving problems with many classes (large number of cell types). If verose is set to true, you should see output warnings during training with (`!!NaNs vectors produced!!`, these are not a problem if they only persist for a single iteration and is gone in the next).
+- AntiSplodge is prone to be affected by bad initiations. Oftentimes, this can be resolved by simply restarting the Experiment (or re-initializing the model). This seems to be more frequent when solving problems with many classes (large number of cell types).
