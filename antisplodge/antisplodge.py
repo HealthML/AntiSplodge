@@ -9,7 +9,7 @@ from datetime import date
 import time
 
 #  expose version from _version file
-from ._version import __version__
+from _version import __version__
 
 def multinomialSampler(Nc, M, CD_min, CD_max):
     """A multinomial sampler with a temperatured step function, making sampling of classes/cell types go from equally likely to more extreme (singleton-like).
@@ -389,7 +389,7 @@ class DeconvolutionExperiment:
             dataset=dataset_train,
             batch_size=batch_size,
             shuffle=True
-
+        )
         train_loader_no_shuffle = DataLoader(
             dataset=dataset_train,
             batch_size=batch_size,
@@ -423,7 +423,7 @@ class DeconvolutionExperiment:
         self.val_loader_no_shuffle = val_loader_no_shuffle
         self.test_loader = test_loader
 
-    def setupModel(self, cuda_id=1, dropout=0.33, fps=512, sps=256, lps=128, ops=64, lp=1, normalize_output=False):
+    def setupModel(self, cuda_id=1, dropout=0.0, fps=512, sps=256, lps=128, ops=64, lp=1, normalize_output=False):
         """Initialize the feed forward neural network model. We recommend about half number of nodes per part for each subsequent layer part.
         The first layer should be smaller than the input. Check out the member variable `num_features`.
         This create members: `model`, `device`.
@@ -475,7 +475,7 @@ class DeconvolutionExperiment:
         :type learning_rate: float (0.001, optional)
         :param optimizer: The neural network optimizer, defaults to `None`, and will then use pytorch's `optim.Adam`.
         :type optimizer: Pytorch optimizer (None, optional)
-        :param criterion: The neural network criterion, defaults to `None`, and will then use pytorch's `nn.SmoothL1Loss`.
+        :param criterion: The neural network criterion, defaults to `None`, and will then use pytorch's `nn.L1Loss`.
         :type criterion: Pytorch criterion or loss function (None, optional)
         """
         # define optimizer and criterion if not set
@@ -483,7 +483,7 @@ class DeconvolutionExperiment:
             optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
 
         if criterion == None:
-            criterion = torch.nn.SmoothL1Loss(beta=0.25)
+            criterion = torch.nn.L1Loss()
 
         # attach members as to the model object
         self.model.Set("optimizer", optimizer)
@@ -657,7 +657,7 @@ def train(experiment, patience=25, save_file=None, auto_load_model_on_finish=Tru
         # report current stats
         if experiment.verbose:
             print(f'Epoch: {e_+0:03} | Epochs since last increase: {(p_-1)+0:03}' + (' | Better solution found' if found_better_weights else ''))
-            print(f'Loss: (Train) {tel:.5f} | (Valid): {vel:.5f}')
+            print(f'Loss: (Train) {tel:.5f} | (Valid): {vel:.5f} - (mean)JSD: (Train) {getMeanJSD(experiment, split_dataset="train"):.5f} | (Valid) {getMeanJSD(experiment, split_dataset="validation"):.5f} ')
             print("")
 
     print("Finished training (checkpoint saved in: {})".format(save_file))
@@ -697,22 +697,13 @@ def predict(experiment, test_loader=None):
             #
             # SCALE TO 1
             #
-            # debug added
             y_pred = nn.functional.relu(y_pred) # first remove negatives
-
-            if np.sum(np.isnan(y_pred.detach().cpu().numpy())) > 0:
-                if experiment.verbose:
-                    print("y_pred is nan (before)")
 
             # scale to 1
             sums_ = torch.sum(y_pred, 1)
             y_pred = torch.transpose(y_pred, 0, 1)
             y_pred = torch.div(y_pred, sums_)
             y_pred = torch.transpose(y_pred, 0, 1)
-
-            if np.sum(np.isnan(y_pred.detach().cpu().numpy())) > 0:
-                if experiment.verbose:
-                    print("y_pred is nan (after)")
 
             #
             # END OF SCALING
@@ -724,7 +715,7 @@ def predict(experiment, test_loader=None):
 
     return profiles
 
-def getMeanJSD(experiment, split_dataset="test"):
+def getMeanJSD(experiment, split_dataset="test", show_warning=False):
     """Get the mean Jensen-Shannon Divergence for one of the split datasets.
 
     :param split_dataset: A string indicating which split dataset to use.
@@ -754,7 +745,7 @@ def getMeanJSD(experiment, split_dataset="test"):
         jsds_.append(distance.jensenshannon(proportions[i], y_preds[i]))
 
     nan_counts = np.count_nonzero(np.isnan(jsds_))
-    if nan_counts > 0:
+    if nan_counts > 0 and show_warning:
         print("Caution: {} NaNs found.".format(nan_counts))
 
     return np.nanmean(jsds_)
