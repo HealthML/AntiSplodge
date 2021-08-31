@@ -169,6 +169,23 @@ Exp.generateTrainTestValidation(num_profiles=[1,1,1000], CD=[1,10])
 # Continue as usual
 ```
 
+**5. Searching for solution near recent local minima**
+# Do 100 warm restarts with decreasing learning rate 
+lr = 0.01 # Consider changing learning rate (lr) during run
+best_error=None # no target error to beat in the beginning
+for k in range(100):
+    lr /= 1.5
+    #print("Training with learning rate:", lr)
+    Exp.setupOptimizerAndCriterion(learning_rate = lr)
+    
+    # Train the experiment constructed by passing the experiment to the AntiSplodge training function 
+    AS.train(Exp, save_file="ModelCheckpoint.pt", patience=, best_loss=best_error) # For longer training, increase patience threshold
+    best_error = AS.getMeanJSD(Exp, "validation") # set best error as the target error to beat
+    
+    print("Restart [{}] - JSDs".format(k),AS.getMeanJSD(Exp, "train"), AS.getMeanJSD(Exp, "validation"))
+    
+    
+print("Test accuracy", AS.getMeanJSD(Exp, "test"))
 ### Tutorial
 Check out the tutorial located at: https://github.com/HealthML/AntiSplodge_Turorial. This will give you a full tour from preprocessing to deconvoluting by predicting cell type proportions of the spatial transcriptomics spots.
 
