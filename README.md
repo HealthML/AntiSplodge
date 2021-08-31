@@ -172,7 +172,7 @@ Exp.generateTrainTestValidation(num_profiles=[1,1,1000], CD=[1,10])
 **5. Searching for solution near recent local minima**
 
 It is often useful to keep searching in weight settings near recent best weights, do so will the code below:
-```
+```python
 # Do 100 warm restarts with decreasing learning rate 
 lr = 0.01 # Consider changing learning rate (lr) during run
 best_error=None # no target error to beat in the beginning
