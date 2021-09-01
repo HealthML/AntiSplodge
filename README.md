@@ -193,7 +193,7 @@ print("Test accuracy", AS.getMeanJSD(Exp, "test"))
 
 ### Tutorial
 For trying out AntiSplodge we recommed starting with a minimal example using the cells located at the heart cell atlas (https://www.heartcellatlas.org/). 
-You can find the notebook in this repository: ![minimal example](AntiSplodge_minimal_example.ipynb)
+You can find the notebook in this repository: [minimal example](AntiSplodge_minimal_example.ipynb)
 
 Check out the tutorial located at: https://github.com/HealthML/AntiSplodge_Turorial. This will give you a full tour from preprocessing to deconvoluting by predicting cell type proportions of the spatial transcriptomics spots.
 
