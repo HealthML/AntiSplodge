@@ -192,9 +192,13 @@ print("Test accuracy", AS.getMeanJSD(Exp, "test"))
 ```
 
 ### Tutorial
+#### Minimal Example
 For trying out AntiSplodge we recommed starting with a minimal example using the cells located at the heart cell atlas (https://www.heartcellatlas.org/). 
 You can find the notebook in this repository: [minimal example](AntiSplodge_minimal_example.ipynb)
 
+In this particular small example, we achieve a test accuracy of 7.974431% for nuclei scRNA sequencing, which is a better accuracy than what most state-of-the-art tools currently can demonstrate. 
+
+#### More in-depth tutorial
 Check out the tutorial located at: https://github.com/HealthML/AntiSplodge_Turorial. This will give you a full tour from preprocessing to deconvoluting by predicting cell type proportions of the spatial transcriptomics spots.
 
 ## Dependencies
