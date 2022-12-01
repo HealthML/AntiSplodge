@@ -219,7 +219,13 @@ The documentation is available at: https://antisplodge.readthedocs.io/.
 
 ## References
 
-Coming soon.
+#### AntiSplodge: a neural-network-based RNA-profile deconvolution pipeline designed for spatial transcriptomics
+
+DOI: https://doi.org/10.1093/nargab/lqac073
+
+Published: 10 October 2022 in NAR Genomics and Bioinformatics, Volume 4, Issue 4, December 2022, lqac073.
+
+#### Awarded: Editor's Choice
 
 ## License
 
